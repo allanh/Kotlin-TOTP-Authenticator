@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">udn買東西行動金鑰</string>
     <string name="title_activity_scan">ScanActivity</string>
-    <string name="textview">TextView</string>
-    <string name="textview3">TextView</string>
+    <string name="userTextView">TextView</string>
 </resources>

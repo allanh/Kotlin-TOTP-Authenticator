@@ -4,8 +4,13 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import kotlinx.android.synthetic.main.secret_list_item.view.*
-class SecretAdapter(val items : ArrayList<String>, val context: Context) : RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
+class SecretAdapter(val items : ArrayList<Pair<String, String>>, val context: Context) : RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
+    class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val tv_secret_type: TextView = v.findViewById(R.id.tv_secret_type)
+        val tv_user_type: TextView = v.findViewById(R.id.tv_user_type)
+    }
     override fun getItemCount(): Int {
         return items.size
     }
@@ -15,11 +20,7 @@ class SecretAdapter(val items : ArrayList<String>, val context: Context) : Recyc
     }
     // Binds each animal in the ArrayList to a view
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
-        p0?.tvAnimalType?.text = items.get(p1)
-    }
-
-    class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
-        // Holds the TextView that will add each animal to
-        val tvAnimalType = view.tv_secret_type
+        p0?.tv_secret_type?.text = items.get(p1).first
+        p0?.tv_user_type?.text = items.get(p1).second
     }
 }

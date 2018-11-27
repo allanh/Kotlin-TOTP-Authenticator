@@ -17,7 +17,7 @@ import android.view.MenuItem
 
 class MainActivity : AppCompatActivity() {
     // Initializing an empty ArrayList to be filled with animals
-    val secrets: ArrayList<String> = ArrayList()
+    val secrets: ArrayList<Pair<String, String>> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,10 +34,12 @@ class MainActivity : AppCompatActivity() {
         val auth = data?.extras?.getString("auth")
         val uri = Uri.parse(auth)
         val secret = uri.getQueryParameter("secret")
+        val user = uri.path
         val config = TimeBasedOneTimePasswordConfig(codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
             timeStep = 30, timeStepUnit = java.util.concurrent.TimeUnit.SECONDS)
         val timeBasedOneTimePasswordGenerator = TimeBasedOneTimePasswordGenerator(Base32().decode(secret), config)
-        addSecret(timeBasedOneTimePasswordGenerator.generate())
+        val pin = timeBasedOneTimePasswordGenerator.generate()
+        addSecret(Pair<String, String>(pin, user))
 
         // Creates a vertical Layout Manager
         my_recycler_view.layoutManager = LinearLayoutManager(this)
@@ -68,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
         startActivityForResult(intent, 1)
     }
-    fun addSecret(secret: String) {
+    fun addSecret(secret: Pair<String, String>) {
         secrets.add(secret)
     }
 }
