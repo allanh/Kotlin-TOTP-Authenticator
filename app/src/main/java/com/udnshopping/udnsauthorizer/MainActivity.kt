@@ -37,16 +37,6 @@ class MainActivity : AppCompatActivity() {
         // Access the RecyclerView Adapter and load the data into it
         my_recycler_view.adapter = SecretAdapter(secrets, this)
     }
-    fun scan(view: View) {
-        val intent = Intent(this, ScanActivity::class.java).apply {
-
-        }
-        startActivityForResult(intent, 1)
-    }
-
-    fun addSecret(secret: String) {
-        secrets.add(secret)
-    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -76,5 +66,26 @@ class MainActivity : AppCompatActivity() {
         val inflater = menuInflater
         inflater.inflate(R.menu.toolbar_menu, menu)
         return super.onCreateOptionsMenu(menu)
+    }
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_camera -> {
+            // User chose the "Settings" item, show the app settings UI...
+            scan()
+            true
+        }
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
+    fun scan() {
+        val intent = Intent(this, ScanActivity::class.java).apply {
+
+        }
+        startActivityForResult(intent, 1)
+    }
+    fun addSecret(secret: String) {
+        secrets.add(secret)
     }
 }

@@ -18,7 +18,6 @@ import java.io.IOException
 
 class ScanActivity : AppCompatActivity() {
     private var cameraView: SurfaceView? = null
-    private var textResults: TextView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (ContextCompat.checkSelfPermission(applicationContext,
@@ -49,7 +48,6 @@ class ScanActivity : AppCompatActivity() {
     fun startCamera() {
         setContentView(R.layout.activity_scan)
         cameraView = findViewById<SurfaceView>(R.id.surfaceView) as SurfaceView
-        textResults = findViewById<TextView>(R.id.textView) as TextView
         val detector = BarcodeDetector.Builder(applicationContext)
             .setBarcodeFormats(Barcode.ALL_FORMATS)
             .build()
