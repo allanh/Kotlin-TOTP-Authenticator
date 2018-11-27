@@ -13,6 +13,8 @@ import java.util.*
 import android.net.Uri
 import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
+import android.view.Menu
+import android.view.MenuItem
 
 class MainActivity : AppCompatActivity() {
     private var textResults: TextView? = null
@@ -68,5 +70,11 @@ class MainActivity : AppCompatActivity() {
 
         // Access the RecyclerView Adapter and load the data into it
         my_recycler_view.adapter = SecretAdapter(secrets, this)
+    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu to use in the action bar
+        val inflater = menuInflater
+        inflater.inflate(R.menu.toolbar_menu, menu)
+        return super.onCreateOptionsMenu(menu)
     }
 }
