@@ -19,8 +19,11 @@ import com.google.gson.reflect.TypeToken
 
 class MainActivity : AppCompatActivity() {
 
-    private val secrets: MutableList<secret> = mutableListOf()
-    private val pins: MutableList<pin> = mutableListOf()
+    private val secrets: MutableList<Secret> = mutableListOf()
+    private val pins: MutableList<Pin> = mutableListOf()
+    private val kAuth = "auth"
+    private val kSecret = "secret"
+    private val kSecretList = "secretList"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,20 +39,20 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        val auth = data?.extras?.getString("auth")
+        val auth = data?.extras?.getString(kAuth)
         val uri = Uri.parse(auth)
-        val secretKey = uri.getQueryParameter("secret")
+        val secretKey = uri.getQueryParameter(kSecret)
         val user = uri.path
 
-        val secret: secret = secret(secretKey, user)
+        val secret = Secret(secretKey, user)
         addSecret(secret)
 
         //--SAVE Data
         val preferences = getPreferences(Context.MODE_PRIVATE)
         val editor = preferences.edit()
-        val type = object : TypeToken<List<secret>>() {}.type
+        val type = object : TypeToken<List<Secret>>() {}.type
         val json = Gson().toJson(secrets, type)
-        editor.putString("PINs", json).apply()
+        editor.putString(kSecretList, json).apply()
         editor.commit()
 
         updatePinsAfterClear()
@@ -76,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    data class secret(
+    data class Secret(
         @SerializedName("secret") private val _key: String?,
         @SerializedName("user") private val _value: String?
     ) {
@@ -87,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             get() = _value ?: ""
     }
 
-    data class pin(
+    data class Pin(
         @SerializedName("pin") private val _key: String?,
         @SerializedName("user") private val _value: String?
     ) {
@@ -107,19 +110,20 @@ class MainActivity : AppCompatActivity() {
 
         for (secret in secrets) {
             val timeBasedOneTimePasswordGenerator = TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
-            val pin: pin = pin(timeBasedOneTimePasswordGenerator.generate(), secret.value)
+            val pinString = timeBasedOneTimePasswordGenerator.generate()
+            val pin = Pin(pinString, secret.value)
             addPin(pin)
         }
     }
 
-    private fun addPin(pin: pin) {
+    private fun addPin(pin: Pin) {
         pins += pin
     }
 
-    private fun getSecretList(): List<secret> {
-        val type = object : TypeToken<List<secret>>() {}.type
+    private fun getSecretList(): List<Secret> {
+        val type = object : TypeToken<List<Secret>>() {}.type
         val preferences = getPreferences(Context.MODE_PRIVATE)
-        val json = preferences.getString("PINs", "")
+        val json = preferences.getString(kSecretList, "")
         return if (json.isNotBlank()) Gson().fromJson(json, type) else listOf()
     }
 
@@ -137,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(intent, 1)
     }
 
-    private fun addSecret(secret: secret) {
+    private fun addSecret(secret: Secret) {
         secrets += secret
     }
 }
