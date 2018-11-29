@@ -33,7 +33,8 @@ class SecretAdapter(val items: List<MainActivity.Pin>?, val context: Context) :
 
     // Binds each animal in the ArrayList to a view
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
-        p0?.tv_secret_type?.text = items?.get(p1)?.key
+        val key = items?.get(p1)?.key
+        p0?.tv_secret_type?.text = "${key?.substring(0, 3)} ${key?.substring(3, 6)}"
         p0?.tv_user_type?.text = items?.get(p1)?.value?.removePrefix("/UDN:")
         val progress = (30 - (items?.get(p1)?.progress!! % 30)) * 100 / 30
         p0?.progressBar.progress = progress
