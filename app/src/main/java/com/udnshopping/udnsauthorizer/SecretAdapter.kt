@@ -8,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
-import java.util.*
-import java.text.SimpleDateFormat
 
 class SecretAdapter(val items: List<MainActivity.Pin>?, val context: Context) :
     RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
@@ -36,7 +34,7 @@ class SecretAdapter(val items: List<MainActivity.Pin>?, val context: Context) :
     // Binds each animal in the ArrayList to a view
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
         p0?.tv_secret_type?.text = items?.get(p1)?.key
-        p0?.tv_user_type?.text = items?.get(p1)?.value
+        p0?.tv_user_type?.text = items?.get(p1)?.value?.removePrefix("/UDN:")
         val progress = (30 - (items?.get(p1)?.progress!! % 30)) * 100 / 30
         p0?.progressBar.progress = progress
     }

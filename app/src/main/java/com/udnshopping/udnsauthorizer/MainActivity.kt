@@ -13,6 +13,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import android.view.Menu
 import android.view.MenuItem
 import android.content.Context
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -116,27 +119,17 @@ class MainActivity : AppCompatActivity() {
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 } finally {
-                    val df = SimpleDateFormat("ss")
-                    val second = df.format(Calendar.getInstance().time).toInt()
                     runOnUiThread {
-//                        if (second == 30 || second == 0) {
-                            updateUI()
-//                        } else {
-//                            updateProgress()
-//                        }
+                        updateUI()
                     }
                 }
             }
         }).start()
     }
 
-    private fun updateProgress() {
-        my_recycler_view.adapter?.notifyDataSetChanged()
-    }
-
     private fun updateUI() {
         updatePinsAfterClear()
-        updateProgress()
+        my_recycler_view.adapter?.notifyDataSetChanged()
     }
 
     private fun updatePinsAfterClear() {
@@ -171,6 +164,19 @@ class MainActivity : AppCompatActivity() {
         my_recycler_view.layoutManager = LinearLayoutManager(this)
         // Access the RecyclerView Adapter and load the data into it
         my_recycler_view.adapter = SecretAdapter(pins, this)
+        my_recycler_view.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+
+        val swipeHandler = object : SwipeToDeleteCallback(this) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val adapter = my_recycler_view.adapter as SecretAdapter
+                secrets.removeAt(viewHolder.adapterPosition)
+                pins.removeAt(viewHolder.adapterPosition)
+                updateUI()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(my_recycler_view)
+
     }
 
     private fun scan() {
