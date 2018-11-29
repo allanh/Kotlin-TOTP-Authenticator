@@ -95,13 +95,17 @@ class MainActivity : AppCompatActivity() {
 
     data class Pin(
         @SerializedName("pin") private val _key: String?,
-        @SerializedName("user") private val _value: String?
+        @SerializedName("user") private val _value: String?,
+        @SerializedName("progress") private val _progress: Int?
     ) {
         val key: String
             get() = _key ?: ""
 
         val value: String
             get() = _value ?: ""
+
+        val progress: Int
+            get() = _progress ?: 0
     }
 
     private fun fire() {
@@ -114,19 +118,25 @@ class MainActivity : AppCompatActivity() {
                 } finally {
                     val df = SimpleDateFormat("ss")
                     val second = df.format(Calendar.getInstance().time).toInt()
-                    if (second == 30 || second == 0) {
-                        runOnUiThread {
+                    runOnUiThread {
+//                        if (second == 30 || second == 0) {
                             updateUI()
-                        }
+//                        } else {
+//                            updateProgress()
+//                        }
                     }
                 }
             }
         }).start()
     }
 
+    private fun updateProgress() {
+        my_recycler_view.adapter?.notifyDataSetChanged()
+    }
+
     private fun updateUI() {
         updatePinsAfterClear()
-        my_recycler_view.adapter?.notifyDataSetChanged()
+        updateProgress()
     }
 
     private fun updatePinsAfterClear() {
@@ -135,12 +145,12 @@ class MainActivity : AppCompatActivity() {
             codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
             timeStep = 30, timeStepUnit = java.util.concurrent.TimeUnit.SECONDS
         )
-
         for (secret in secrets) {
             val timeBasedOneTimePasswordGenerator =
                 TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
             val pinString = timeBasedOneTimePasswordGenerator.generate()
-            val pin = Pin(pinString, secret.value)
+            val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
+            val pin = Pin(pinString, secret.value, progress)
             addPin(pin)
         }
     }
