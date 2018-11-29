@@ -16,6 +16,8 @@ import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,11 +31,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val secret = getSecretList()
-        secrets += secret
+        secrets += getSecretList()
 
         updatePinsAfterClear()
         adapteSecret()
+
+        fire()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -56,7 +59,7 @@ class MainActivity : AppCompatActivity() {
         editor.commit()
 
         updatePinsAfterClear()
-        my_recycler_view.adapter?.notifyItemInserted(pins.size)
+        my_recycler_view.adapter?.notifyItemInserted(secrets.size)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -101,6 +104,31 @@ class MainActivity : AppCompatActivity() {
             get() = _value ?: ""
     }
 
+    private fun fire() {
+        Thread(Runnable {
+            while (true) {
+                try {
+                    Thread.sleep(1000)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                } finally {
+                    val df = SimpleDateFormat("ss")
+                    val second = df.format(Calendar.getInstance().time).toInt()
+                    if (second == 30 || second == 0) {
+                        runOnUiThread {
+                            updateUI()
+                        }
+                    }
+                }
+            }
+        }).start()
+    }
+
+    private fun updateUI() {
+        updatePinsAfterClear()
+        my_recycler_view.adapter?.notifyDataSetChanged()
+    }
+
     private fun updatePinsAfterClear() {
         pins.clear()
         val config = TimeBasedOneTimePasswordConfig(
@@ -109,7 +137,8 @@ class MainActivity : AppCompatActivity() {
         )
 
         for (secret in secrets) {
-            val timeBasedOneTimePasswordGenerator = TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
+            val timeBasedOneTimePasswordGenerator =
+                TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
             val pinString = timeBasedOneTimePasswordGenerator.generate()
             val pin = Pin(pinString, secret.value)
             addPin(pin)
