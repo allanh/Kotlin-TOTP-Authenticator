@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import kotlinx.android.synthetic.main.secret_list_item.view.*
-class SecretAdapter(val items : List<MainActivity.PIN>?, val context: Context) : RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
+class SecretAdapter(val items : List<MainActivity.pin>?, val context: Context) : RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
     class ViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         val tv_secret_type: TextView = v.findViewById(R.id.tv_secret_type)
         val tv_user_type: TextView = v.findViewById(R.id.tv_user_type)

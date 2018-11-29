@@ -18,15 +18,18 @@ import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 
 class MainActivity : AppCompatActivity() {
-    // Initializing an empty ArrayList to be filled with animals
-    private val secrets: MutableList<PIN> = mutableListOf()
+
+    private val secrets: MutableList<secret> = mutableListOf()
+    private val pins: MutableList<pin> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val pins = getPinList()
-        secrets += pins
+        val secret = getSecretList()
+        secrets += secret
+
+        updatePinsAfterClear()
         adapteSecret()
     }
 
@@ -35,24 +38,22 @@ class MainActivity : AppCompatActivity() {
 
         val auth = data?.extras?.getString("auth")
         val uri = Uri.parse(auth)
-        val secret = uri.getQueryParameter("secret")
+        val secretKey = uri.getQueryParameter("secret")
         val user = uri.path
-        val config = TimeBasedOneTimePasswordConfig(
-            codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
-            timeStep = 30, timeStepUnit = java.util.concurrent.TimeUnit.SECONDS
-        )
-        val timeBasedOneTimePasswordGenerator = TimeBasedOneTimePasswordGenerator(Base32().decode(secret), config)
-        val pin: PIN = PIN(timeBasedOneTimePasswordGenerator.generate(), user)
-        addSecret(pin)
+
+        val secret: secret = secret(secretKey, user)
+        addSecret(secret)
+
         //--SAVE Data
         val preferences = getPreferences(Context.MODE_PRIVATE)
         val editor = preferences.edit()
-        val type = object : TypeToken<List<PIN>>() {}.type
+        val type = object : TypeToken<List<secret>>() {}.type
         val json = Gson().toJson(secrets, type)
         editor.putString("PINs", json).apply()
         editor.commit()
 
-        adapteSecret()
+        updatePinsAfterClear()
+        my_recycler_view.adapter?.notifyItemInserted(pins.size)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    data class PIN(
+    data class secret(
         @SerializedName("secret") private val _key: String?,
         @SerializedName("user") private val _value: String?
     ) {
@@ -86,28 +87,57 @@ class MainActivity : AppCompatActivity() {
             get() = _value ?: ""
     }
 
-    fun getPinList(): List<PIN> {
-        val type = object : TypeToken<List<PIN>>() {}.type
+    data class pin(
+        @SerializedName("pin") private val _key: String?,
+        @SerializedName("user") private val _value: String?
+    ) {
+        val key: String
+            get() = _key ?: ""
+
+        val value: String
+            get() = _value ?: ""
+    }
+
+    private fun updatePinsAfterClear() {
+        pins.clear()
+        val config = TimeBasedOneTimePasswordConfig(
+            codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
+            timeStep = 30, timeStepUnit = java.util.concurrent.TimeUnit.SECONDS
+        )
+
+        for (secret in secrets) {
+            val timeBasedOneTimePasswordGenerator = TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
+            val pin: pin = pin(timeBasedOneTimePasswordGenerator.generate(), secret.value)
+            addPin(pin)
+        }
+    }
+
+    private fun addPin(pin: pin) {
+        pins += pin
+    }
+
+    private fun getSecretList(): List<secret> {
+        val type = object : TypeToken<List<secret>>() {}.type
         val preferences = getPreferences(Context.MODE_PRIVATE)
         val json = preferences.getString("PINs", "")
         return if (json.isNotBlank()) Gson().fromJson(json, type) else listOf()
     }
 
-    fun adapteSecret() {
+    private fun adapteSecret() {
         // Creates a vertical Layout Manager
         my_recycler_view.layoutManager = LinearLayoutManager(this)
         // Access the RecyclerView Adapter and load the data into it
-        my_recycler_view.adapter = SecretAdapter(secrets, this)
+        my_recycler_view.adapter = SecretAdapter(pins, this)
     }
 
-    fun scan() {
+    private fun scan() {
         val intent = Intent(this, ScanActivity::class.java).apply {
 
         }
         startActivityForResult(intent, 1)
     }
 
-    fun addSecret(pin: PIN) {
-        secrets += pin
+    private fun addSecret(secret: secret) {
+        secrets += secret
     }
 }
