@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -19,9 +17,13 @@ import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
 import android.view.View
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.FILL_PARENT
+
 
 class ScanActivity : AppCompatActivity() {
     private var cameraView: SurfaceView? = null
+    var box: Box? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -67,6 +69,11 @@ class ScanActivity : AppCompatActivity() {
 
     fun startCamera() {
         setContentView(R.layout.activity_scan)
+        box = Box(this)
+        addContentView(
+            box,
+            ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        )
         cameraView = findViewById<SurfaceView>(R.id.surfaceView) as SurfaceView
         val detector = BarcodeDetector.Builder(applicationContext)
             .setBarcodeFormats(Barcode.ALL_FORMATS)
@@ -106,13 +113,36 @@ class ScanActivity : AppCompatActivity() {
             fun receiveDetections(detections: Detector.Detections<Barcode>) {
                 val barcodes = detections.getDetectedItems();
                 if (barcodes.size() != 0) {
-                    val intent = Intent(this@ScanActivity, MainActivity::class.java)
-                    intent.putExtra("auth", barcodes.valueAt(0).displayValue)
-                    setResult(1, intent)
-                    this@ScanActivity.finish()
+                    val barcode = barcodes.valueAt(0)
+                    val rectangle: Rect? = this@ScanActivity.box?.rectangle
+                    val metaData = detections.frameMetadata
+                    val matrix = Matrix()
+                    matrix.setScale(
+                        (box!!.right - box!!.left).toFloat() / metaData.width,
+                        (box!!.bottom - box!!.top).toFloat() / metaData.height
+                    )
+                    var boundingBox = RectF(barcode.boundingBox)
+                    matrix.mapRect(boundingBox, RectF(barcode.boundingBox))
+                    rectangle?.let {
+                        if (it.contains(
+                                Rect(
+                                    boundingBox.left.toInt(),
+                                    boundingBox.top.toInt(),
+                                    boundingBox.right.toInt(),
+                                    boundingBox.bottom.toInt()
+                                )
+                            )
+                        ) {
+                            val intent = Intent(this@ScanActivity, MainActivity::class.java)
+                            println(boundingBox)
+                            intent.putExtra("auth", barcodes.valueAt(0).displayValue)
+                            setResult(1, intent)
+                            this@ScanActivity.finish()
+                        }
+                    }
                 }
             }
-        });
+        })
 
         if (!detector!!.isOperational) {
             return
