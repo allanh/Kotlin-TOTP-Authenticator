@@ -140,12 +140,14 @@ class MainActivity : AppCompatActivity() {
             timeStep = 30, timeStepUnit = java.util.concurrent.TimeUnit.SECONDS
         )
         for (secret in secrets) {
-            val timeBasedOneTimePasswordGenerator =
-                TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
-            val pinString = timeBasedOneTimePasswordGenerator.generate()
-            val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
-            val pin = Pin(pinString, secret.value, progress)
-            addPin(pin)
+            if (secret.key.length > 0 && secret.value.length > 0) {
+                val timeBasedOneTimePasswordGenerator =
+                    TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
+                val pinString = timeBasedOneTimePasswordGenerator.generate()
+                val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
+                val pin = Pin(pinString, secret.value, progress)
+                addPin(pin)
+            }
         }
     }
 
