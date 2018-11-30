@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val kAuth = "auth"
     private val kSecret = "secret"
     private val kSecretList = "secretList"
+    private var isRefreshing = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,7 +114,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun fire() {
         Thread(Runnable {
-            while (true) {
+            while (isRefreshing) {
                 try {
                     Thread.sleep(1000)
                 } catch (e: InterruptedException) {
