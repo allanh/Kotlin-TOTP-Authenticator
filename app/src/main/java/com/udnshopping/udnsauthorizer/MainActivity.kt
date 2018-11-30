@@ -46,6 +46,9 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        if (data == null) {
+            return
+        }
         val auth = data?.extras?.getString(kAuth)
         val uri = Uri.parse(auth)
         val secretKey = uri.getQueryParameter(kSecret)
