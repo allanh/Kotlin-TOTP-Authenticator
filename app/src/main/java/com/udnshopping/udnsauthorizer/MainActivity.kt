@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         secrets += getSecretList()
 
         updatePinsAfterClear()
-        adapteSecret()
+        adaptSecret()
 
         fire()
     }
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         val secretKey = uri.getQueryParameter(kSecret)
         val user = uri.path
 
-        if (secretKey.length > 0 && user.length > 0) {
+        if (secretKey.isNotEmpty() && user.isNotEmpty()) {
             val secret = Secret(secretKey, user)
             addSecret(secret)
         }
@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
             timeStep = 30, timeStepUnit = java.util.concurrent.TimeUnit.SECONDS
         )
         for (secret in secrets) {
-            if (secret.key.length > 0 && secret.value.length > 0) {
+            if (secret.key.isNotEmpty() && secret.value.isNotEmpty()) {
                 val timeBasedOneTimePasswordGenerator =
                     TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
                 val pinString = timeBasedOneTimePasswordGenerator.generate()
@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
         return if (json.isNotBlank()) Gson().fromJson(json, type) else listOf()
     }
 
-    private fun adapteSecret() {
+    private fun adaptSecret() {
         // Creates a vertical Layout Manager
         my_recycler_view.layoutManager = LinearLayoutManager(this)
         // Access the RecyclerView Adapter and load the data into it
@@ -176,7 +176,6 @@ class MainActivity : AppCompatActivity() {
 
         val swipeHandler = object : SwipeToDeleteCallback(this) {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val adapter = my_recycler_view.adapter as SecretAdapter
                 secrets.removeAt(viewHolder.adapterPosition)
                 pins.removeAt(viewHolder.adapterPosition)
                 updateUI()
@@ -184,8 +183,8 @@ class MainActivity : AppCompatActivity() {
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
         itemTouchHelper.attachToRecyclerView(my_recycler_view)
-
     }
+
 
     private fun scan() {
         val intent = Intent(this, ScanActivity::class.java).apply {
@@ -198,3 +197,4 @@ class MainActivity : AppCompatActivity() {
         secrets += secret
     }
 }
+
