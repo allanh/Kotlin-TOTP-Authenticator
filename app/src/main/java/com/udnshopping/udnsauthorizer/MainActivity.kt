@@ -51,8 +51,10 @@ class MainActivity : AppCompatActivity() {
         val secretKey = uri.getQueryParameter(kSecret)
         val user = uri.path
 
-        val secret = Secret(secretKey, user)
-        addSecret(secret)
+        if (secretKey.length > 0 && user.length > 0) {
+            val secret = Secret(secretKey, user)
+            addSecret(secret)
+        }
 
         //--SAVE Data
         val preferences = getPreferences(Context.MODE_PRIVATE)
