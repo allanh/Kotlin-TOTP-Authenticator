@@ -16,6 +16,8 @@ import android.content.Context
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.view.MotionEvent
+import android.view.View
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
@@ -30,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private val kSecret = "secret"
     private val kSecretList = "secretList"
     private var isRefreshing = true
+    private val refreshThred = Thread()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,22 @@ class MainActivity : AppCompatActivity() {
         adaptSecret()
 
         fire()
+        my_recycler_view.setOnTouchListener(object : View.OnTouchListener {
+            override fun onTouch(v: View, m: MotionEvent): Boolean {
+                // Perform tasks here
+                when(m.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        isRefreshing = false
+                        refreshThred.interrupt()
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        isRefreshing = true
+                        fire()
+                    }
+                }
+                return false
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -119,19 +138,22 @@ class MainActivity : AppCompatActivity() {
 
     private fun fire() {
         Thread(Runnable {
-            while (isRefreshing) {
+            while (true) {
                 try {
                     Thread.sleep(1000)
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 } finally {
-                    runOnUiThread {
-                        updateUI()
+                    if (isRefreshing) {
+                        runOnUiThread {
+                            updateUI()
+                        }
                     }
                 }
             }
         }).start()
     }
+
 
     private fun updateUI() {
         updatePinsAfterClear()
@@ -163,7 +185,20 @@ class MainActivity : AppCompatActivity() {
     private fun getSecretList(): List<Secret> {
         val type = object : TypeToken<List<Secret>>() {}.type
         val preferences = getPreferences(Context.MODE_PRIVATE)
-        val json = preferences.getString(kSecretList, "")
+        var json = preferences.getString(kSecretList, "")
+        if (json.isEmpty()) {
+            json =
+                    "[" +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
+                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}" +
+                    "]"
+        }
         return if (json.isNotBlank()) Gson().fromJson(json, type) else listOf()
     }
 
@@ -185,7 +220,6 @@ class MainActivity : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(my_recycler_view)
     }
 
-
     private fun scan() {
         val intent = Intent(this, ScanActivity::class.java).apply {
 
@@ -197,4 +231,6 @@ class MainActivity : AppCompatActivity() {
         secrets += secret
     }
 }
+
+
 
