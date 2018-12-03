@@ -185,20 +185,7 @@ class MainActivity : AppCompatActivity() {
     private fun getSecretList(): List<Secret> {
         val type = object : TypeToken<List<Secret>>() {}.type
         val preferences = getPreferences(Context.MODE_PRIVATE)
-        var json = preferences.getString(kSecretList, "")
-        if (json.isEmpty()) {
-            json =
-                    "[" +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}," +
-                    "{\"secret\":\"YKIA6SBODOCYQ3JQ\",\"user\":\"/UDN:jarvis@soez.tw\"}" +
-                    "]"
-        }
+        val json = preferences.getString(kSecretList, "")
         return if (json.isNotBlank()) Gson().fromJson(json, type) else listOf()
     }
 
