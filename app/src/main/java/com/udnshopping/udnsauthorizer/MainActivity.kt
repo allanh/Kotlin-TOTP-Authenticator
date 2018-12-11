@@ -62,6 +62,17 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    override fun onStop() {
+        super.onStop()
+        //--SAVE Data
+        val preferences = getPreferences(Context.MODE_PRIVATE)
+        val editor = preferences.edit()
+        val type = object : TypeToken<List<Secret>>() {}.type
+        val json = Gson().toJson(secrets, type)
+        editor.putString(kSecretList, json).apply()
+        editor.commit()
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
