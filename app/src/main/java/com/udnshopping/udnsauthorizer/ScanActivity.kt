@@ -1,10 +1,12 @@
 package com.udnshopping.udnsauthorizer
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
+import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
@@ -18,7 +20,6 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.FILL_PARENT
 
 
 class ScanActivity : AppCompatActivity() {
@@ -91,7 +92,6 @@ class ScanActivity : AppCompatActivity() {
                 } catch (ex: IOException) {
                     ex.printStackTrace()
                 }
-
             }
 
             override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -135,7 +135,8 @@ class ScanActivity : AppCompatActivity() {
                         ) {
                             val intent = Intent(this@ScanActivity, MainActivity::class.java)
                             println(boundingBox)
-                            intent.putExtra("auth", barcodes.valueAt(0).displayValue)
+                            var auth = barcodes.valueAt(0).displayValue
+                            intent.putExtra("auth", auth)
                             setResult(1, intent)
                             this@ScanActivity.finish()
                         }

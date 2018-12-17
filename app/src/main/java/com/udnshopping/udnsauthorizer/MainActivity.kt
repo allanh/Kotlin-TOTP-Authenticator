@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import android.view.Menu
 import android.view.MenuItem
 import android.content.Context
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
@@ -31,15 +32,16 @@ class MainActivity : AppCompatActivity() {
     private val kAuth = "auth"
     private val kSecret = "secret"
     private val kSecretList = "secretList"
+    private val kAccount = "acc"
     private var isRefreshing = true
     private val refreshThred = Thread()
-
+    private val kErrorQrcodeMessage = "無效的QRCode"
+    private val kDone = "確定"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         secrets += getSecretList()
-
         updatePinsAfterClear()
         adaptSecret()
 
@@ -80,25 +82,51 @@ class MainActivity : AppCompatActivity() {
             return
         }
         val auth = data?.extras?.getString(kAuth)
-        val uri = Uri.parse(auth)
-        val secretKey = uri.getQueryParameter(kSecret)
-        val user = uri.path
-
-        if (secretKey.isNotEmpty() && user.isNotEmpty()) {
-            val secret = Secret(secretKey, user)
-            addSecret(secret)
+        var secret: Secret? = null
+        if (auth?.length == 90 && !auth?.startsWith("\"otpauth://totp/\"")) {
+            val decryptString = auth?.substring(2)
+            val decrypt = ThreeDESUtil.decrypt(decryptString!!)
+            if (!decrypt.isNullOrEmpty()) {
+                val type = object : TypeToken<Map<String, String>>() {}.type
+                val json = decrypt
+                val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
+                if (!secretInfo.isNullOrEmpty()) {
+                    secret = Secret(secretInfo[kSecret], secretInfo[kAccount])
+                }
+            }
         }
+        else if (!Uri.parse(auth).getQueryParameter(kSecret).isNullOrEmpty()) {
+            val uri = Uri.parse(auth)
+            val secretKey = uri.getQueryParameter(kSecret)
+            val user = uri.path
+            if (!secretKey.isNullOrEmpty() && !user.isNullOrEmpty()) {
+                secret = Secret(secretKey, user)
+            }
+        }
+        else {
+            val alertDialog = AlertDialog.Builder(this@MainActivity).create()
+            alertDialog.setMessage(kErrorQrcodeMessage)
+            alertDialog.setButton(
+                AlertDialog.BUTTON_NEUTRAL, kDone
+            ) { dialog, which ->
+                dialog.dismiss()
+            }
+            alertDialog.show()
+        }
+        if (secret != null) {
+            addSecret(secret)
 
-        //--SAVE Data
-        val preferences = getPreferences(Context.MODE_PRIVATE)
-        val editor = preferences.edit()
-        val type = object : TypeToken<List<Secret>>() {}.type
-        val json = Gson().toJson(secrets, type)
-        editor.putString(kSecretList, json).apply()
-        editor.commit()
+            //--SAVE Data
+            val preferences = getPreferences(Context.MODE_PRIVATE)
+            val editor = preferences.edit()
+            val type = object : TypeToken<List<Secret>>() {}.type
+            val json = Gson().toJson(secrets, type)
+            editor.putString(kSecretList, json).apply()
+            editor.commit()
 
-        updatePinsAfterClear()
-        my_recycler_view.adapter?.notifyItemInserted(secrets.size)
+            updatePinsAfterClear()
+            my_recycler_view.adapter?.notifyItemInserted(secrets.size)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
