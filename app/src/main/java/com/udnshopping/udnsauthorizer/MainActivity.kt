@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
         my_recycler_view.setOnTouchListener(object : View.OnTouchListener {
             override fun onTouch(v: View, m: MotionEvent): Boolean {
                 // Perform tasks here
-                when(m.action) {
+                when (m.action) {
                     MotionEvent.ACTION_DOWN -> {
                         isRefreshing = false
                         refreshThred.interrupt()
@@ -86,32 +86,25 @@ class MainActivity : AppCompatActivity() {
         if (auth?.length == 90 && !auth?.startsWith("\"otpauth://totp/\"")) {
             val decryptString = auth?.substring(2)
             val decrypt = ThreeDESUtil.decrypt(decryptString!!)
-            if (!decrypt.isNullOrEmpty()) {
+            if (!decrypt.isNullOrEmpty() && decrypt.contains("acc", ignoreCase = false)) {
                 val type = object : TypeToken<Map<String, String>>() {}.type
                 val json = decrypt
                 val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
                 if (!secretInfo.isNullOrEmpty()) {
                     secret = Secret(secretInfo[kSecret], secretInfo[kAccount])
                 }
+            } else {
+                errorQRCodeAlert()
             }
-        }
-        else if (!Uri.parse(auth).getQueryParameter(kSecret).isNullOrEmpty()) {
+        } else if (!Uri.parse(auth).getQueryParameter(kSecret).isNullOrEmpty()) {
             val uri = Uri.parse(auth)
             val secretKey = uri.getQueryParameter(kSecret)
             val user = uri.path
             if (!secretKey.isNullOrEmpty() && !user.isNullOrEmpty()) {
                 secret = Secret(secretKey, user)
             }
-        }
-        else {
-            val alertDialog = AlertDialog.Builder(this@MainActivity).create()
-            alertDialog.setMessage(kErrorQrcodeMessage)
-            alertDialog.setButton(
-                AlertDialog.BUTTON_NEUTRAL, kDone
-            ) { dialog, which ->
-                dialog.dismiss()
-            }
-            alertDialog.show()
+        } else {
+            errorQRCodeAlert()
         }
         if (secret != null) {
             addSecret(secret)
@@ -215,6 +208,17 @@ class MainActivity : AppCompatActivity() {
                 addPin(pin)
             }
         }
+    }
+
+    private fun errorQRCodeAlert() {
+        val alertDialog = AlertDialog.Builder(this@MainActivity).create()
+        alertDialog.setMessage(kErrorQrcodeMessage)
+        alertDialog.setButton(
+            AlertDialog.BUTTON_NEUTRAL, kDone
+        ) { dialog, which ->
+            dialog.dismiss()
+        }
+        alertDialog.show()
     }
 
     private fun addPin(pin: Pin) {
