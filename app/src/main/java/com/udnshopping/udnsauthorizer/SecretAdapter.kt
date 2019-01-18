@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import java.text.ParseException
+import java.text.SimpleDateFormat
 
 class SecretAdapter(val items: List<MainActivity.Pin>?, val context: Context) :
     RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
@@ -35,7 +37,9 @@ class SecretAdapter(val items: List<MainActivity.Pin>?, val context: Context) :
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
         val key = items?.get(p1)?.key
         p0?.tv_secret_type?.text = "${key?.substring(0, 3)} ${key?.substring(3, 6)}"
-        p0?.tv_user_type?.text = items?.get(p1)?.value?.removePrefix("/UDN:")
+        val user = items?.get(p1)?.value?.removePrefix("/UDN:")
+        val displayString = user+"    "+items?.get(p1)?.date
+        p0?.tv_user_type?.text = displayString
         val progress = (30 - (items?.get(p1)?.progress!! % 30)) * 100 / 30
         p0?.progressBar.progress = progress
     }

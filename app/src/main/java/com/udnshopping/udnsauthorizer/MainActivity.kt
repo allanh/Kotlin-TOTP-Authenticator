@@ -35,8 +35,10 @@ class MainActivity : AppCompatActivity() {
     private val kAccount = "acc"
     private var isRefreshing = true
     private val refreshThred = Thread()
-    private val kErrorQrcodeMessage = "無效的QRCode"
+    private val kErrorQrcodeMessage = "無效的 QR 碼"
     private val kDone = "確定"
+    private val kTime = "time"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -83,17 +85,29 @@ class MainActivity : AppCompatActivity() {
         }
         val auth = data?.extras?.getString(kAuth)
         var secret: Secret? = null
-        if (auth?.length == 90 && !auth?.startsWith("\"otpauth://totp/\"")) {
+        if (auth?.length!! > 0 && (auth?.startsWith("otpauth://totp")) == false) {
             val decryptString = auth?.substring(2)
-            val decrypt = ThreeDESUtil.decrypt(decryptString!!)
-            if (!decrypt.isNullOrEmpty() && decrypt.contains("acc", ignoreCase = false)) {
-                val type = object : TypeToken<Map<String, String>>() {}.type
-                val json = decrypt
-                val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
-                if (!secretInfo.isNullOrEmpty()) {
-                    secret = Secret(secretInfo[kSecret], secretInfo[kAccount])
+            try {
+                val decrypt = ThreeDESUtil.decrypt(decryptString!!)
+                if (!decrypt.isNullOrEmpty() && decrypt.contains("acc", ignoreCase = false)) {
+                    val type = object : TypeToken<Map<String, String>>() {}.type
+                    val json = decrypt
+                    val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
+                    if (!secretInfo.isNullOrEmpty()) {
+
+                        val time = secretInfo[kTime]
+                        val timeFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
+                        val date = timeFormat.parse(time)
+                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                        val dateString = dateFormat.format(date)
+
+                        secret = Secret(secretInfo[kSecret], secretInfo[kAccount], dateString)
+                    }
+                } else {
+                    errorQRCodeAlert()
                 }
-            } else {
+            } catch (e: Exception) {
+                e.printStackTrace()
                 errorQRCodeAlert()
             }
         } else if (!Uri.parse(auth).getQueryParameter(kSecret).isNullOrEmpty()) {
@@ -101,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             val secretKey = uri.getQueryParameter(kSecret)
             val user = uri.path
             if (!secretKey.isNullOrEmpty() && !user.isNullOrEmpty()) {
-                secret = Secret(secretKey, user)
+                secret = Secret(secretKey, user, "")
             }
         } else {
             errorQRCodeAlert()
@@ -144,19 +158,24 @@ class MainActivity : AppCompatActivity() {
 
     data class Secret(
         @SerializedName("secret") private val _key: String?,
-        @SerializedName("user") private val _value: String?
+        @SerializedName("user") private val _value: String?,
+        @SerializedName("date") private val _date: String?
     ) {
         val key: String
             get() = _key ?: ""
 
         val value: String
             get() = _value ?: ""
+
+        val date: String
+            get() = _date ?: ""
     }
 
     data class Pin(
         @SerializedName("pin") private val _key: String?,
         @SerializedName("user") private val _value: String?,
-        @SerializedName("progress") private val _progress: Int?
+        @SerializedName("progress") private val _progress: Int?,
+        @SerializedName("date") private val _date: String?
     ) {
         val key: String
             get() = _key ?: ""
@@ -166,6 +185,9 @@ class MainActivity : AppCompatActivity() {
 
         val progress: Int
             get() = _progress ?: 0
+
+        val date: String
+            get() = _date ?: ""
     }
 
     private fun fire() {
@@ -204,7 +226,7 @@ class MainActivity : AppCompatActivity() {
                     TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
                 val pinString = timeBasedOneTimePasswordGenerator.generate()
                 val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
-                val pin = Pin(pinString, secret.value, progress)
+                val pin = Pin(pinString, secret.value, progress, secret.date)
                 addPin(pin)
             }
         }

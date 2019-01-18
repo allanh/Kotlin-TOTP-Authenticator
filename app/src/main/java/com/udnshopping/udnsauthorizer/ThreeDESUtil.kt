@@ -16,7 +16,7 @@ object ThreeDESUtil {
     val ENCODE_MODE = Cipher.ENCRYPT_MODE       // 加密模式
     val DECODE_MODE = Cipher.DECRYPT_MODE       // 解密模式
 
-    val PASSWORD = "zPwDpHmoSwkuRfNMoPaasAbG"
+    val PASSWORD = "lyAOvVCxkYvyTzSeEyRwkfzX"
 
     private fun desEncypt(mode: Int, password: String, content: ByteArray): ByteArray {
 
