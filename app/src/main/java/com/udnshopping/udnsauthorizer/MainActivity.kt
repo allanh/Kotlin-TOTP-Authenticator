@@ -17,6 +17,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import com.google.gson.Gson
@@ -27,8 +28,10 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity"
     private val secrets: MutableList<Secret> = mutableListOf()
     private val pins: MutableList<Pin> = mutableListOf()
+    private val pinMap: MutableMap<String, Pin> = mutableMapOf()
     private val kAuth = "auth"
     private val kSecret = "secret"
     private val kSecretList = "secretList"
@@ -85,7 +88,9 @@ class MainActivity : AppCompatActivity() {
         }
         val auth = data?.extras?.getString(kAuth)
         var secret: Secret? = null
-        if (auth?.length!! > 0 && (auth?.startsWith("otpauth://totp")) == false) {
+        val auth_length = auth?.length ?: 0
+
+        if (auth_length > 0 && (auth?.startsWith("otpauth://totp")) == false) {
             val decryptString = auth?.substring(2)
             try {
                 val decrypt = ThreeDESUtil.decrypt(decryptString!!)
@@ -93,9 +98,11 @@ class MainActivity : AppCompatActivity() {
                     val type = object : TypeToken<Map<String, String>>() {}.type
                     val json = decrypt
                     val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
-                    if (!secretInfo.isNullOrEmpty()) {
+                    Log.d(TAG, "secretInfo: ${secretInfo?.toString()}")
 
+                    if (!secretInfo.isNullOrEmpty()) {
                         val time = secretInfo[kTime]
+                        Log.d("Main", "time: $time")
                         val timeFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
                         val date = timeFormat.parse(time)
                         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
@@ -175,7 +182,8 @@ class MainActivity : AppCompatActivity() {
         @SerializedName("pin") private val _key: String?,
         @SerializedName("user") private val _value: String?,
         @SerializedName("progress") private val _progress: Int?,
-        @SerializedName("date") private val _date: String?
+        @SerializedName("date") private val _date: String?,
+        var isValid: Boolean = true
     ) {
         val key: String
             get() = _key ?: ""
@@ -216,6 +224,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun updatePinsAfterClear() {
         pins.clear()
+        pinMap.clear()
         val config = TimeBasedOneTimePasswordConfig(
             codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
             timeStep = 30, timeStepUnit = java.util.concurrent.TimeUnit.SECONDS
@@ -230,6 +239,8 @@ class MainActivity : AppCompatActivity() {
                 addPin(pin)
             }
         }
+
+        updatePinListState()
     }
 
     private fun errorQRCodeAlert() {
@@ -245,6 +256,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun addPin(pin: Pin) {
         pins += pin
+    }
+
+    private fun updatePinListState() {
+        for (i in pins.size-1 downTo 0) {
+            var key = pins[i].key
+            if (!pinMap.containsKey(key)) {
+                pinMap[key] = pins[i]
+            } else {
+                val lastPin = pinMap[key] as Pin
+                if (lastPin.value == pins[i].value && lastPin.date > pins[i].date) {
+                    pins[i].isValid = false
+                }
+            }
+        }
     }
 
     private fun getSecretList(): List<Secret> {
