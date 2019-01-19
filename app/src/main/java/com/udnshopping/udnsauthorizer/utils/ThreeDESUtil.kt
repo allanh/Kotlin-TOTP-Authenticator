@@ -1,14 +1,10 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.utils
 
 import android.util.Base64
-import android.util.Base64.decode
-import android.util.Base64.encode
 import java.lang.Exception
 import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.DESedeKeySpec
-import javax.crypto.spec.IvParameterSpec
-import kotlin.text.Charsets.UTF_8
 
 object ThreeDESUtil {
 
@@ -37,22 +33,36 @@ object ThreeDESUtil {
 
     private fun enCode(password: String, message: String): String {
         val bytes = message.toByteArray()
-        val desEncypt = desEncypt(ENCODE_MODE, password, bytes)
+        val desEncypt = desEncypt(
+            ENCODE_MODE,
+            password,
+            bytes
+        )
         val encode = Base64.encode(desEncypt, Base64.DEFAULT)
         return String(encode)
     }
 
     private fun deCode(password: String, message: String): String {
         val bytes = Base64.decode(message, Base64.DEFAULT)
-        val desEncypt = desEncypt(DECODE_MODE, password, bytes)
+        val desEncypt = desEncypt(
+            DECODE_MODE,
+            password,
+            bytes
+        )
         return String(desEncypt)
     }
 
     fun encrypt(message: String): String {
-        return enCode(PASSWORD, message)
+        return enCode(
+            PASSWORD,
+            message
+        )
     }
 
     fun decrypt(message: String): String {
-        return deCode(PASSWORD, message)
+        return deCode(
+            PASSWORD,
+            message
+        )
     }
 }

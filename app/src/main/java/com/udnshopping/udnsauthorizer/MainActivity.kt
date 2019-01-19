@@ -17,12 +17,14 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import com.google.gson.Gson
-import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import com.udnshopping.udnsauthorizer.models.Pin
+import com.udnshopping.udnsauthorizer.models.Secret
+import com.udnshopping.udnsauthorizer.utils.Logger
+import com.udnshopping.udnsauthorizer.utils.ThreeDESUtil
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -41,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private val kErrorQrcodeMessage = "無效的 QR 碼"
     private val kDone = "確定"
     private val kTime = "time"
+    private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,14 +101,13 @@ class MainActivity : AppCompatActivity() {
                     val type = object : TypeToken<Map<String, String>>() {}.type
                     val json = decrypt
                     val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
-                    Log.d(TAG, "secretInfo: ${secretInfo?.toString()}")
+                    Logger.d(TAG, "secretInfo: ${secretInfo?.toString()}")
 
                     if (!secretInfo.isNullOrEmpty()) {
                         val time = secretInfo[kTime]
                         val timeFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
                         val date = timeFormat.parse(time)
-                        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                        val dateString = dateFormat.format(date)
+                        val dateString = DATE_FORMAT.format(date)
 
                         secret = Secret(secretInfo[kSecret], secretInfo[kAccount], dateString)
                     }
@@ -160,41 +162,6 @@ class MainActivity : AppCompatActivity() {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
-    }
-
-    data class Secret(
-        @SerializedName("secret") private val _key: String?,
-        @SerializedName("user") private val _value: String?,
-        @SerializedName("date") private val _date: String?
-    ) {
-        val key: String
-            get() = _key ?: ""
-
-        val value: String
-            get() = _value ?: ""
-
-        val date: String
-            get() = _date ?: ""
-    }
-
-    data class Pin(
-        @SerializedName("pin") private val _key: String?,
-        @SerializedName("user") private val _value: String?,
-        @SerializedName("progress") private val _progress: Int?,
-        @SerializedName("date") private val _date: String?,
-        var isValid: Boolean = true
-    ) {
-        val key: String
-            get() = _key ?: ""
-
-        val value: String
-            get() = _value ?: ""
-
-        val progress: Int
-            get() = _progress ?: 0
-
-        val date: String
-            get() = _date ?: ""
     }
 
     private fun fire() {
@@ -264,7 +231,10 @@ class MainActivity : AppCompatActivity() {
                 pinMap[key] = pins[i]
             } else {
                 val lastPin = pinMap[key] as Pin
-                if (lastPin.value == pins[i].value && lastPin.date > pins[i].date) {
+                val lastDate = DATE_FORMAT.parse(lastPin.date)
+                val pinDate = DATE_FORMAT.parse(pins[i].date)
+                Logger.d(TAG, "LastDate: ${lastDate.time} PinDate: ${pinDate.time}")
+                if (lastPin.value == pins[i].value && lastDate.time > pinDate.time) {
                     pins[i].isValid = false
                 }
             }

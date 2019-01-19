@@ -1,27 +1,18 @@
 package com.udnshopping.udnsauthorizer
 
 import android.content.Context
-import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.graphics.Color
-import android.graphics.ColorFilter
-import android.graphics.PorterDuff
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.Drawable
-import android.os.Handler
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.udnshopping.udnsauthorizer.extensions.setProgressTintColor
-import java.text.ParseException
-import java.text.SimpleDateFormat
+import com.udnshopping.udnsauthorizer.models.Pin
 
-class SecretAdapter(private val items: List<MainActivity.Pin>?, private val context: Context) :
+class SecretAdapter(private val items: List<Pin>?, private val context: Context) :
     RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -71,6 +62,7 @@ class SecretAdapter(private val items: List<MainActivity.Pin>?, private val cont
 
         viewHolder.tvSecretType.setTextColor(secretColor)
         viewHolder.tvUserType.setTextColor(userColor)
+        viewHolder.tvDate.setTextColor(userColor)
         viewHolder.progressBar.setProgressTintColor(secretColor)
     }
 }
