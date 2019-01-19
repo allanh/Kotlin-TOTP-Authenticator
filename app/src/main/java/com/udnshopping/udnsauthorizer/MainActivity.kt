@@ -102,7 +102,6 @@ class MainActivity : AppCompatActivity() {
 
                     if (!secretInfo.isNullOrEmpty()) {
                         val time = secretInfo[kTime]
-                        Log.d("Main", "time: $time")
                         val timeFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
                         val date = timeFormat.parse(time)
                         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
