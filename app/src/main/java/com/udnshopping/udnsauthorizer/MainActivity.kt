@@ -19,6 +19,9 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MotionEvent
 import android.view.View
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.udnshopping.udnsauthorizer.models.Pin
@@ -30,7 +33,6 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = "MainActivity"
     private val secrets: MutableList<Secret> = mutableListOf()
     private val pins: MutableList<Pin> = mutableListOf()
     private val pinMap: MutableMap<String, Pin> = mutableMapOf()
@@ -44,10 +46,18 @@ class MainActivity : AppCompatActivity() {
     private val kDone = "確定"
     private val kTime = "time"
     private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    private var isEmailInput = true
+
+    private lateinit var remoteConfig: FirebaseRemoteConfig
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Initialize FireBase.
+        FirebaseAnalytics.getInstance(this)
+        initRemoteConfig()
+        fetchEmailInputConfig()
 
         secrets += getSecretList()
         updatePinsAfterClear()
@@ -164,6 +174,50 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Get Remote Config instance and Set default Remote Config parameter values.
+     */
+    private fun initRemoteConfig() {
+        remoteConfig = FirebaseRemoteConfig.getInstance()
+        val configSettings = FirebaseRemoteConfigSettings.Builder()
+            .setDeveloperModeEnabled(BuildConfig.DEBUG)
+            .build()
+        remoteConfig.setConfigSettings(configSettings)
+        remoteConfig.setDefaults(R.xml.remote_config_default)
+    }
+
+    /**
+     * Fetch a email input config from the Remote Config service.
+     */
+    private fun fetchEmailInputConfig() {
+
+        val isUsingDeveloperMode = remoteConfig.info.configSettings.isDeveloperModeEnabled
+
+        // If your app is using developer mode, cacheExpiration is set to 0, so each fetch will
+        // retrieve values from the service.
+        val cacheExpiration: Long = if (isUsingDeveloperMode) {
+            0
+        } else {
+            3600 // 1 hour in seconds.
+        }
+
+        // cacheExpirationSeconds is set to cacheExpiration here, indicating the next fetch request
+        // will use fetch data from the Remote Config service, rather than cached parameter values,
+        // if cached parameter values are more than cacheExpiration seconds old.
+        remoteConfig.fetch(cacheExpiration)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // After config data is successfully fetched, it must be activated before newly fetched
+                    // values are returned.
+                    remoteConfig.activateFetched()
+                    isEmailInput = remoteConfig.getBoolean(EMAIL_INPUT_CONFIG_KEY)
+                    //Logger.d(TAG, "isEmailInput: $isEmailInput")
+                } else {
+                    Logger.e(TAG, "Fetch Failed")
+                }
+            }
+    }
+
     private fun fire() {
         Thread(Runnable {
             while (true) {
@@ -275,6 +329,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun addSecret(secret: Secret) {
         secrets += secret
+    }
+
+    companion object {
+
+        private const val TAG = "MainActivity"
+
+        // Remote Config keys
+        private const val EMAIL_INPUT_CONFIG_KEY = "email_input_enabled"
     }
 }
 
