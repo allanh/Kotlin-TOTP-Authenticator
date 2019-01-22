@@ -2,20 +2,19 @@ package com.udnshopping.udnsauthorizer
 
 import android.content.Context
 import android.graphics.Color
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
+import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.udnshopping.udnsauthorizer.extensions.setProgressTintColor
-import com.udnshopping.udnsauthorizer.models.Pin
+import com.udnshopping.udnsauthorizer.data.Pin
 
 class SecretAdapter(private val items: List<Pin>?, private val context: Context) :
-    RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tvSecretType: TextView = view.findViewById(R.id.tv_secret_type)
         val tvUserType: TextView = view.findViewById(R.id.tv_user_type)
         val tvDate: TextView = view.findViewById(R.id.tv_date)

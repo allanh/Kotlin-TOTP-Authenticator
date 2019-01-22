@@ -1,16 +1,13 @@
 package com.udnshopping.udnsauthorizer
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
-import android.net.Uri
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.google.android.gms.vision.CameraSource
@@ -133,7 +130,7 @@ class ScanActivity : AppCompatActivity() {
                                 )
                             )
                         ) {
-                            val intent = Intent(this@ScanActivity, MainActivity::class.java)
+                            val intent = Intent(this@ScanActivity, PinListActivity::class.java)
                             println(boundingBox)
                             var auth = barcodes.valueAt(0).displayValue
                             intent.putExtra("auth", auth)

@@ -7,9 +7,9 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.ItemTouchHelper
 
 
 abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -22,7 +22,7 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
     private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
 
-    override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+    override fun getMovementFlags(recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder): Int {
         /**
          * To disable "swipe" for specific item return 0 here.
          * For example:
@@ -33,12 +33,12 @@ abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleC
         return super.getMovementFlags(recyclerView, viewHolder)
     }
 
-    override fun onMove(p0: RecyclerView, p1: RecyclerView.ViewHolder, p2: RecyclerView.ViewHolder): Boolean {
+    override fun onMove(p0: androidx.recyclerview.widget.RecyclerView, p1: androidx.recyclerview.widget.RecyclerView.ViewHolder, p2: androidx.recyclerview.widget.RecyclerView.ViewHolder): Boolean {
         return false
     }
 
     override fun onChildDraw(
-        c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
+        c: Canvas, recyclerView: androidx.recyclerview.widget.RecyclerView, viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder,
         dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
     ) {
 

@@ -1,22 +1,19 @@
 package com.udnshopping.udnsauthorizer
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.marcelkliemannel.kotlinonetimepassword.HmacAlgorithm
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordConfig
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordGenerator
 import org.apache.commons.codec.binary.Base32
 import android.net.Uri
-import android.support.v7.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 import android.view.Menu
 import android.view.MenuItem
 import android.content.Context
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.ItemTouchHelper
 import android.view.MotionEvent
 import android.view.View
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -24,14 +21,14 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.udnshopping.udnsauthorizer.models.Pin
-import com.udnshopping.udnsauthorizer.models.Secret
-import com.udnshopping.udnsauthorizer.utils.Logger
-import com.udnshopping.udnsauthorizer.utils.ThreeDESUtil
+import com.udnshopping.udnsauthorizer.data.Pin
+import com.udnshopping.udnsauthorizer.data.Secret
+import com.udnshopping.udnsauthorizer.utilities.Logger
+import com.udnshopping.udnsauthorizer.utilities.ThreeDESUtil
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainActivity : AppCompatActivity() {
+class PinListActivity : AppCompatActivity() {
 
     private val secrets: MutableList<Secret> = mutableListOf()
     private val pins: MutableList<Pin> = mutableListOf()
@@ -52,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_pins)
 
         // Initialize FireBase.
         FirebaseAnalytics.getInstance(this)
@@ -264,7 +261,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun errorQRCodeAlert() {
-        val alertDialog = AlertDialog.Builder(this@MainActivity).create()
+        val alertDialog = AlertDialog.Builder(this@PinListActivity).create()
         alertDialog.setMessage(kErrorQrcodeMessage)
         alertDialog.setButton(
             AlertDialog.BUTTON_NEUTRAL, kDone
@@ -304,13 +301,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun adaptSecret() {
         // Creates a vertical Layout Manager
-        my_recycler_view.layoutManager = LinearLayoutManager(this)
+        my_recycler_view.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         // Access the RecyclerView Adapter and load the data into it
         my_recycler_view.adapter = SecretAdapter(pins, this)
-        my_recycler_view.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
+        my_recycler_view.addItemDecoration(
+            androidx.recyclerview.widget.DividerItemDecoration(
+                this,
+                androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
+            )
+        )
 
         val swipeHandler = object : SwipeToDeleteCallback(this) {
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
                 secrets.removeAt(viewHolder.adapterPosition)
                 pins.removeAt(viewHolder.adapterPosition)
                 updateUI()
@@ -333,7 +335,7 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
 
-        private const val TAG = "MainActivity"
+        private const val TAG = "PinListActivity"
 
         // Remote Config keys
         private const val EMAIL_INPUT_CONFIG_KEY = "email_input_enabled"
