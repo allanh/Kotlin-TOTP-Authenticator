@@ -25,6 +25,7 @@ import com.udnshopping.udnsauthorizer.data.Pin
 import com.udnshopping.udnsauthorizer.data.Secret
 import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.utilities.ThreeDESUtil
+import kotlinx.android.synthetic.main.activity_pins.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -50,6 +51,9 @@ class PinListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pins)
+        setSupportActionBar(findViewById(R.id.my_toolbar))
+        actionBar?.setHomeButtonEnabled(true)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 
         // Initialize FireBase.
         FirebaseAnalytics.getInstance(this)
@@ -96,14 +100,14 @@ class PinListActivity : AppCompatActivity() {
         if (data == null) {
             return
         }
-        val auth = data?.extras?.getString(kAuth)
+        val auth = data.extras?.getString(kAuth)
         var secret: Secret? = null
         val auth_length = auth?.length ?: 0
 
         if (auth_length > 0 && (auth?.startsWith("otpauth://totp")) == false) {
-            val decryptString = auth?.substring(2)
+            val decryptString = auth.substring(2)
             try {
-                val decrypt = ThreeDESUtil.decrypt(decryptString!!)
+                val decrypt = ThreeDESUtil.decrypt(decryptString)
                 if (!decrypt.isNullOrEmpty() && decrypt.contains("acc", ignoreCase = false)) {
                     val type = object : TypeToken<Map<String, String>>() {}.type
                     val json = decrypt
@@ -159,6 +163,11 @@ class PinListActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        android.R.id.home -> {
+            scan()
+            true
+        }
+
         R.id.action_camera -> {
             // User chose the "Settings" item, show the app settings UI...
             scan()
@@ -277,7 +286,7 @@ class PinListActivity : AppCompatActivity() {
 
     private fun updatePinListState() {
         for (i in pins.size-1 downTo 0) {
-            var key = pins[i].key
+            var key = pins[i].value
             if (!pinMap.containsKey(key)) {
                 pinMap[key] = pins[i]
             } else {
@@ -285,7 +294,7 @@ class PinListActivity : AppCompatActivity() {
                 val lastDate = DATE_FORMAT.parse(lastPin.date)
                 val pinDate = DATE_FORMAT.parse(pins[i].date)
                 Logger.d(TAG, "LastDate: ${lastDate.time} PinDate: ${pinDate.time}")
-                if (lastPin.value == pins[i].value && lastDate.time > pinDate.time) {
+                if (lastDate.time > pinDate.time) {
                     pins[i].isValid = false
                 }
             }
