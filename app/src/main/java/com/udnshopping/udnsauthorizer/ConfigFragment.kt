@@ -36,4 +36,23 @@ class ConfigFragment  : Fragment() {
 
         return rootView;
     }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        android.R.id.home -> {
+            // GoTo config
+//            findNavController(R.id.nav_host_fragment).navigate(R.id.action_mainFragment_to_configFragment)
+            true
+        }
+
+        R.id.action_camera -> {
+            // User chose the "Settings" item, show the app settings UI...
+            (activity as MainActivity).scan()
+            true
+        }
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
 }

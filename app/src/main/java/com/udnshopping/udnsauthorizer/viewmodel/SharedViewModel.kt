@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -17,27 +19,42 @@ import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.utilities.ThreeDESUtil
 import kotlinx.android.synthetic.main.activity_pins.*
 import org.apache.commons.codec.binary.Base32
+import java.text.FieldPosition
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 class SharedViewModel(var activity: Activity?) : ViewModel() {
 
-    private val secrets: MutableList<Secret> = mutableListOf()
-    private val pins: MutableList<Pin> = mutableListOf()
-    private val pinMap: MutableMap<String, Pin> = mutableMapOf()
+    private var secrets: MutableList<Secret> = mutableListOf()
+    var pins = MutableLiveData<MutableList<Pin>>()
+    //private val pinMap: MutableMap<String, Pin> = mutableMapOf()
 
     init {
-        Logger.d(TAG, "init")
-        secrets += getSecretList()
+        secrets = getSecretList()
+        updatePins()
         Logger.d(TAG, "secrets size: ${secrets.size}")
     }
 
-    fun getSecretList(): List<Secret> {
+    private fun getSecretList(): MutableList<Secret> {
         val type = object : TypeToken<List<Secret>>() {}.type
         val preferences = activity?.getPreferences(Context.MODE_PRIVATE)
         val json = preferences?.getString(kSecretList, "") ?: ""
-        return if (json.isNotBlank()) Gson().fromJson(json, type) else listOf()
+        return if (json.isNotBlank()) Gson().fromJson(json, type) else mutableListOf()
+    }
+
+    fun getPinList() = pins.value
+
+    @Synchronized fun removeAt(position: Int) {
+        Logger.d(TAG, "removeAt: $position")
+        if (position >= 0 && position < secrets.size) {
+            secrets.removeAt(position)
+            Logger.d(TAG, "removed secret list size: ${secrets.size}")
+            var tempPins = pins.value?.toMutableList()
+            tempPins?.removeAt(position)
+            pins.value = tempPins
+            Logger.d(TAG, "removed pin list size: ${pins.value?.size}")
+        }
     }
 
     fun addData(extra: Bundle?) {
@@ -83,20 +100,20 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
         }
         if (secret != null) {
             Logger.d(TAG, "add secret")
-            addSecret(secret)
+            secrets.add(secret)
 
             //--SAVE Data
             saveData()
 
-            updatePinsAfterClear()
+            updatePins()
 //            my_recycler_view.adapter?.notifyItemInserted(secrets.size)
         }
     }
 
 
-    private fun updatePinsAfterClear() {
-        pins.clear()
-        pinMap.clear()
+    private fun updatePins() {
+        var pinList = mutableListOf<Pin>()
+
         val config = TimeBasedOneTimePasswordConfig(
             codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
             timeStep = 30, timeStepUnit = TimeUnit.SECONDS
@@ -108,38 +125,34 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
                 val pinString = timeBasedOneTimePasswordGenerator.generate()
                 val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
                 val pin = Pin(pinString, secret.value, progress, secret.date)
-                addPin(pin)
+                pinList.add(pin)
             }
         }
 
-        updatePinListState()
+        updatePinListState(pinList)
     }
 
-    private fun updatePinListState() {
-        for (i in pins.size-1 downTo 0) {
-            var key = pins[i].value
+    private fun updatePinListState(pinList: MutableList<Pin>) {
+
+        var pinMap = mutableMapOf<String, Pin>()
+        var tempPins = pinList.toMutableList()
+
+        for (i in tempPins.size-1 downTo 0) {
+            var key = tempPins[i].value
             if (!pinMap.containsKey(key)) {
-                pinMap[key] = pins[i]
+                pinMap[key] = tempPins[i]
             } else {
                 val lastPin = pinMap[key] as Pin
                 val lastDate = DATE_FORMAT.parse(lastPin.date)
-                val pinDate = DATE_FORMAT.parse(pins[i].date)
+                val pinDate = DATE_FORMAT.parse(tempPins[i].date)
                 Logger.d(TAG, "LastDate: ${lastDate.time} PinDate: ${pinDate.time}")
                 if (lastDate.time > pinDate.time) {
-                    pins[i].isValid = false
+                    tempPins[i].isValid = false
                 }
             }
         }
-    }
 
-    private fun addPin(pin: Pin) {
-        Logger.d(TAG, "addPin: ${pin.value}")
-        pins += pin
-    }
-
-    private fun addSecret(secret: Secret) {
-        Logger.d(TAG, "addSecret: ${secret.value}")
-        secrets += secret
+        pins.value = tempPins
     }
 
     fun isDataEmpty() = secrets.size == 0

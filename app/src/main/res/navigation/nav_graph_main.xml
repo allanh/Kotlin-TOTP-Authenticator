@@ -25,5 +25,7 @@
         <action android:id="@+id/action_mainFragment_to_pinsFragment" app:destination="@id/pinsFragment"/>
     </fragment>
     <fragment android:id="@+id/pinsFragment" android:name="com.udnshopping.udnsauthorizer.PinsFragment"
-              android:label="PinsFragment"/>
+              android:label="PinsFragment">
+        <action android:id="@+id/action_pinsFragment_to_mainFragment" app:destination="@id/mainFragment"/>
+    </fragment>
 </navigation>

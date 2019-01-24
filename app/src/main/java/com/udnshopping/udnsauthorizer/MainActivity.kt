@@ -3,6 +3,8 @@ package com.udnshopping.udnsauthorizer
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
@@ -10,6 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
+import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 
@@ -29,21 +32,23 @@ class MainActivity : AppCompatActivity() {
         var binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         //setContentView(R.layout.activity_main)
-//        setSupportActionBar(findViewById(R.id.my_toolbar))
-//        actionBar?.hide()
-//        actionBar?.setHomeButtonEnabled(true)
-//        actionBar?.setDisplayHomeAsUpEnabled(true)
+        setSupportActionBar(findViewById(R.id.my_toolbar))
+        actionBar?.hide()
+        actionBar?.setHomeButtonEnabled(true)
+        actionBar?.setDisplayHomeAsUpEnabled(true)
 
         mViewModel = ViewModelProviders.of(this,
             SharedViewModelFactory(this)).get(SharedViewModel::class.java)
         binding.viewModel = mViewModel
 
-        val host: NavHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment? ?: return
+
+
+        //val host: NavHostFragment = supportFragmentManager
+            //.findFragmentById(R.id.nav_host_fragment) as NavHostFragment? ?: return
 
         // Set up Action Bar
-        val navController = host.navController
-        appBarConfiguration = AppBarConfiguration(navController.graph)
+        //val navController = host.navController
+        //appBarConfiguration = AppBarConfiguration(navController.graph)
         //setupActionBarWithNavController(navController)
 /*
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -84,17 +89,23 @@ class MainActivity : AppCompatActivity() {
         */
     }
 
-    public override fun onResume() {
-        super.onResume()
-        if (!mViewModel.isDataEmpty()) {
-            findNavController(R.id.nav_host_fragment).navigate(R.id.action_mainFragment_to_pinsFragment)
-        }
-    }
 //
 //    public override fun onPause() {
 //        super.onPause()
 //        overridePendingTransition(0, 0)
 //    }
+
+    override fun onBackPressed() {
+//        val fragments = supportFragmentManager.backStackEntryCount
+//        Logger.d(TAG, "fragments: $fragments")
+//        if (fragments == 1) {
+            finish()
+//        } else if (fragments > 1) {
+//            supportFragmentManager.popBackStack()
+//        } else {
+//            super.onBackPressed()
+//        }
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp();
@@ -113,7 +124,7 @@ class MainActivity : AppCompatActivity() {
         }
         mViewModel.addData(data.extras)
     }
-/*
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu to use in the action bar
         val inflater = menuInflater
@@ -139,26 +150,6 @@ class MainActivity : AppCompatActivity() {
             super.onOptionsItemSelected(item)
         }
     }
-*/
-
-    private fun fire() {
-        Thread(Runnable {
-            while (true) {
-                try {
-                    Thread.sleep(1000)
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                } finally {
-                    if (isRefreshing) {
-                        runOnUiThread {
-                            updateUI()
-                        }
-                    }
-                }
-            }
-        }).start()
-    }
-
 
     private fun updateUI() {
         //updatePinsAfterClear()

@@ -10,9 +10,14 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.udnshopping.udnsauthorizer.extensions.setProgressTintColor
 import com.udnshopping.udnsauthorizer.data.Pin
+import com.udnshopping.udnsauthorizer.utilities.Logger
+import java.text.SimpleDateFormat
+import java.util.*
 
-class SecretAdapter(private val items: List<Pin>?, private val context: Context) :
+class SecretAdapter(private val items: MutableList<Pin>?, private val context: Context) :
     androidx.recyclerview.widget.RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
+
+    private var mProgress = 0
 
     class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tvSecretType: TextView = view.findViewById(R.id.tv_secret_type)
@@ -43,9 +48,11 @@ class SecretAdapter(private val items: List<Pin>?, private val context: Context)
         viewHolder.tvUserType.text = user
         viewHolder.tvDate.text = items[position].date
 
+        Logger.d("item progress", "mProgress: $mProgress")
         // Progress
-        val progress = (30 - (items[position].progress % 30)) * 100 / 30
-        viewHolder.progressBar.progress = progress
+        //val progress = (30 - (items[position].progress % 30)) * 100 / 30
+        //Logger.d("adapter", "progress: $progress")
+        viewHolder.progressBar.progress = mProgress
 
         // Set color
         val isValid: Boolean = items[position].isValid
@@ -55,7 +62,7 @@ class SecretAdapter(private val items: List<Pin>?, private val context: Context)
         if (!isValid) {
             userColor = Color.LTGRAY
             secretColor = Color.LTGRAY
-        } else if (progress < 33) {
+        } else if (mProgress < 33) {
             secretColor = Color.RED
         }
 
@@ -63,5 +70,11 @@ class SecretAdapter(private val items: List<Pin>?, private val context: Context)
         viewHolder.tvUserType.setTextColor(userColor)
         viewHolder.tvDate.setTextColor(userColor)
         viewHolder.progressBar.setProgressTintColor(secretColor)
+    }
+
+    fun updateProgress() {
+        val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
+        mProgress = (30 - (progress % 30)) * 100 / 30
+        notifyDataSetChanged()
     }
 }
