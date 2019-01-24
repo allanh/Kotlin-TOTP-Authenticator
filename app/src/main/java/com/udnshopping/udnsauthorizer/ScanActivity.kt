@@ -130,7 +130,7 @@ class ScanActivity : AppCompatActivity() {
                                 )
                             )
                         ) {
-                            val intent = Intent(this@ScanActivity, PinListActivity::class.java)
+                            val intent = Intent(this@ScanActivity, MainActivity::class.java)
                             println(boundingBox)
                             var auth = barcodes.valueAt(0).displayValue
                             intent.putExtra("auth", auth)

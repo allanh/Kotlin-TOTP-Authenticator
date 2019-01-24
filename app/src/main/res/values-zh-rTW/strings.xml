@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">udn SPM OTP</string>
     <string name="title_activity_scan">ScanActivity</string>
+    <string name="title_activity_config">ConfigActivity</string>
     <string name="userTextView">TextView</string>
     <string name="otp_usage">
         1. 在 udn買東西綜合電商-登入驗證APP發送通知信中，會包含一張QR碼。\n
