@@ -2,11 +2,8 @@ package com.udnshopping.udnsauthorizer
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.*
 import android.os.Bundle
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -17,7 +14,6 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
 import android.view.View
 import android.view.ViewGroup
-
 
 class ScanActivity : AppCompatActivity() {
     private var cameraView: SurfaceView? = null
@@ -30,39 +26,7 @@ class ScanActivity : AppCompatActivity() {
         // Remember that you should never show the action bar if the
         // status bar is hidden, so hide that too if necessary.
         actionBar?.hide()
-
-        if (ContextCompat.checkSelfPermission(
-                applicationContext,
-                android.Manifest.permission.CAMERA
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@ScanActivity,
-                    android.Manifest.permission.CAMERA
-                )
-            ) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(
-                    this@ScanActivity,
-                    arrayOf(android.Manifest.permission.CAMERA),
-                    0
-                )
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
-            }
-        } else {
-            // Permission has already been granted
-            startCamera()
-        }
+        startCamera()
     }
 
     fun startCamera() {
@@ -130,7 +94,7 @@ class ScanActivity : AppCompatActivity() {
                                 )
                             )
                         ) {
-                            val intent = Intent(this@ScanActivity, MainActivity::class.java)
+                            val intent = Intent(this@ScanActivity, PinsActivity::class.java)
                             println(boundingBox)
                             var auth = barcodes.valueAt(0).displayValue
                             intent.putExtra("auth", auth)
@@ -147,8 +111,10 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        startCamera()
+
+    companion object {
+
+        private const val TAG = "ScanActivity"
+
     }
 }

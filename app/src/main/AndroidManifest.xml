@@ -13,7 +13,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".MainActivity"
+        <activity android:name=".PinsActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -23,11 +23,6 @@
         <activity
                 android:name=".ScanActivity"
                 android:label="@string/title_activity_scan"
-                android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
-                android:name=".ConfigActivity"
-                android:label="@string/title_activity_config"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

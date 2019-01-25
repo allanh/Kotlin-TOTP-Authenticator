@@ -10,4 +10,15 @@
     </string>
     <string name="get_qrcode">取得 QR 碼</string>
     <string name="scan_qrcode">我知道了</string>
+    <string name="permission_dialog_title">若拒絕授權使用相機，將無法取得驗證碼</string>
+    <string name="permission_dialog_content">前往設定開啟相機權限</string>
+    <string name="ok">確定</string>
+    <string name="cancel">取消</string>
+    <string name="setting">設定</string>
+    <string name="qrcode_error">無效的 QR 碼</string>
+    <string name="pins_hint">
+        1. 點擊右上角的相機圖案，進入手掃描畫面。\n\n
+        2. 將郵件中的 QR 碼置於橘色框線中。\n\n
+        3. 如果 QR 碼正確，會自動產生驗證碼。
+    </string>
 </resources>

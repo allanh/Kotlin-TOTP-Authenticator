@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import androidx.lifecycle.LiveData
+import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.gson.Gson
@@ -12,14 +12,12 @@ import com.google.gson.reflect.TypeToken
 import com.marcelkliemannel.kotlinonetimepassword.HmacAlgorithm
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordConfig
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordGenerator
-import com.udnshopping.udnsauthorizer.MainActivity
 import com.udnshopping.udnsauthorizer.data.Pin
 import com.udnshopping.udnsauthorizer.data.Secret
+import com.udnshopping.udnsauthorizer.extensions.SingleLiveEvent
 import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.utilities.ThreeDESUtil
-import kotlinx.android.synthetic.main.activity_pins.*
 import org.apache.commons.codec.binary.Base32
-import java.text.FieldPosition
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -27,8 +25,9 @@ import java.util.concurrent.TimeUnit
 class SharedViewModel(var activity: Activity?) : ViewModel() {
 
     private var secrets: MutableList<Secret> = mutableListOf()
+    val showQRCodeErrorEvent = SingleLiveEvent<Any>()
     var pins = MutableLiveData<MutableList<Pin>>()
-    //private val pinMap: MutableMap<String, Pin> = mutableMapOf()
+    var isDataEmpty = ObservableBoolean(false)
 
     init {
         secrets = getSecretList()
@@ -82,11 +81,11 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
                         secret = Secret(secretInfo[kSecret], secretInfo[kAccount], dateString)
                     }
                 } else {
-//                    errorQRCodeAlert()
+                    showQRCodeErrorEvent.call()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-//                errorQRCodeAlert()
+                showQRCodeErrorEvent.call()
             }
         } else if (!Uri.parse(auth).getQueryParameter(kSecret).isNullOrEmpty()) {
             val uri = Uri.parse(auth)
@@ -96,7 +95,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
                 secret = Secret(secretKey, user, "")
             }
         } else {
-//            errorQRCodeAlert()
+            showQRCodeErrorEvent.call()
         }
         if (secret != null) {
             Logger.d(TAG, "add secret")
@@ -104,14 +103,12 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
 
             //--SAVE Data
             saveData()
-
             updatePins()
-//            my_recycler_view.adapter?.notifyItemInserted(secrets.size)
         }
     }
 
 
-    private fun updatePins() {
+    fun updatePins() {
         var pinList = mutableListOf<Pin>()
 
         val config = TimeBasedOneTimePasswordConfig(
@@ -145,17 +142,16 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
                 val lastPin = pinMap[key] as Pin
                 val lastDate = DATE_FORMAT.parse(lastPin.date)
                 val pinDate = DATE_FORMAT.parse(tempPins[i].date)
-                Logger.d(TAG, "LastDate: ${lastDate.time} PinDate: ${pinDate.time}")
+                //Logger.d(TAG, "LastDate: ${lastDate.time} PinDate: ${pinDate.time}")
                 if (lastDate.time > pinDate.time) {
                     tempPins[i].isValid = false
                 }
             }
         }
 
+        isDataEmpty.set(tempPins.size == 0)
         pins.value = tempPins
     }
-
-    fun isDataEmpty() = secrets.size == 0
 
     fun saveData() {
         Logger.d(TAG, "save data: ${secrets.size}")

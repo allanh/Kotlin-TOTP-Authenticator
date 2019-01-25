@@ -14,10 +14,10 @@ import com.udnshopping.udnsauthorizer.utilities.Logger
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SecretAdapter(private val items: MutableList<Pin>?, private val context: Context) :
+class SecretAdapter(private var items: List<Pin>?, private val context: Context) :
     androidx.recyclerview.widget.RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
 
-    private var mProgress = 0
+    //private var mProgress = 0
 
     class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tvSecretType: TextView = view.findViewById(R.id.tv_secret_type)
@@ -35,46 +35,45 @@ class SecretAdapter(private val items: MutableList<Pin>?, private val context: C
 
     // Binds each animal in the ArrayList to a view
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        if (items == null || position > items.size) {
-            return
+        items?.let {
+            // Key
+            val key = it[position].key
+            viewHolder.tvSecretType.text = "${key.substring(0, 3)} ${key.substring(3, 6)}"
+
+            // User and date
+            val user = it[position].value.removePrefix("/UDN:")
+            viewHolder.tvUserType.text = user
+            viewHolder.tvDate.text = it[position].date
+
+            // Progress
+            val progress = (30 - (it[position].progress % 30)) * 100 / 30
+            //Logger.d("adapter", "progress: $progress")
+            viewHolder.progressBar.progress = progress
+
+            // Set color
+            val isValid: Boolean = it[position].isValid
+            var secretColor = ContextCompat.getColor(context, R.color.holo_orange_dark)
+            var userColor = ContextCompat.getColor(context, R.color.textColorPrimary)
+
+            if (!isValid) {
+                userColor = Color.LTGRAY
+                secretColor = Color.LTGRAY
+            } else if (progress < 33) {
+                secretColor = Color.RED
+            }
+
+            viewHolder.tvSecretType.setTextColor(secretColor)
+            viewHolder.tvUserType.setTextColor(userColor)
+            viewHolder.tvDate.setTextColor(userColor)
+            viewHolder.progressBar.setProgressTintColor(secretColor)
         }
-
-        // Key
-        val key = items[position].key
-        viewHolder.tvSecretType.text = "${key.substring(0, 3)} ${key.substring(3, 6)}"
-
-        // User and date
-        val user = items[position].value.removePrefix("/UDN:")
-        viewHolder.tvUserType.text = user
-        viewHolder.tvDate.text = items[position].date
-
-        Logger.d("item progress", "mProgress: $mProgress")
-        // Progress
-        //val progress = (30 - (items[position].progress % 30)) * 100 / 30
-        //Logger.d("adapter", "progress: $progress")
-        viewHolder.progressBar.progress = mProgress
-
-        // Set color
-        val isValid: Boolean = items[position].isValid
-        var secretColor = ContextCompat.getColor(context, R.color.holo_orange_dark)
-        var userColor = ContextCompat.getColor(context, R.color.textColorPrimary)
-
-        if (!isValid) {
-            userColor = Color.LTGRAY
-            secretColor = Color.LTGRAY
-        } else if (mProgress < 33) {
-            secretColor = Color.RED
-        }
-
-        viewHolder.tvSecretType.setTextColor(secretColor)
-        viewHolder.tvUserType.setTextColor(userColor)
-        viewHolder.tvDate.setTextColor(userColor)
-        viewHolder.progressBar.setProgressTintColor(secretColor)
     }
 
-    fun updateProgress() {
-        val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
-        mProgress = (30 - (progress % 30)) * 100 / 30
+    fun updateData(data: List<Pin>?) {
+        if (data == null) {
+            return
+        }
+        items = data
         notifyDataSetChanged()
     }
 }

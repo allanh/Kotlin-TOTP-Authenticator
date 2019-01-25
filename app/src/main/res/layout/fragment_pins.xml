@@ -4,6 +4,8 @@
          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+        <import type="android.view.View"/>
+
         <variable
                 name="viewModel"
                 type="com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel" />
@@ -13,8 +15,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/darker_gray"
-            tools:context="com.udnshopping.udnsauthorizer.MainActivity">
+            tools:context="com.udnshopping.udnsauthorizer.PinsActivity">
 
+        <TextView
+                android:text="@string/pins_hint"
+                android:gravity="left"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content" android:id="@+id/tv_pins_hint"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:textSize="16dp" android:layout_marginTop="120dp" app:layout_constraintHorizontal_bias="0.49"
+        />
         <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/pins_recycler_view"
                 android:scrollbars="none"

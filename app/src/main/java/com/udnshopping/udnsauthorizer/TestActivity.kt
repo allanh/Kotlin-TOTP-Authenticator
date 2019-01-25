@@ -188,16 +188,6 @@ class TestActivity : AppCompatActivity() {
         startActivityForResult(intent, 1)
     }
 
-    private fun errorQRCodeAlert() {
-        val alertDialog = AlertDialog.Builder(this).create()
-        alertDialog.setMessage(kErrorQrcodeMessage)
-        alertDialog.setButton(
-            AlertDialog.BUTTON_NEUTRAL, kDone
-        ) { dialog, which ->
-            dialog.dismiss()
-        }
-        alertDialog.show()
-    }
 
 //    private fun goMainFragment() {
 //        val ft = supportFragmentManager.beginTransaction()
