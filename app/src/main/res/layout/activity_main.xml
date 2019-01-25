@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/darker_gray"
-            tools:context="com.udnshopping.udnsauthorizer.PinsActivity">
+            tools:context="com.udnshopping.udnsauthorizer.MainActivity">
 
         <androidx.appcompat.widget.Toolbar
                 android:id="@+id/my_toolbar"

@@ -6,20 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
-import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.databinding.FragmentMainBinding
 import com.udnshopping.udnsauthorizer.viewmodel.MainViewModel
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.fragment.findNavController
+import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
-import androidx.appcompat.app.AppCompatActivity
-import com.udnshopping.udnsauthorizer.utilities.Logger
 
 
 class MainFragment : Fragment() {
 
     private lateinit var mViewModel: MainViewModel
-    private lateinit var mSharedViewModel: SharedViewModel
+    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,13 +34,13 @@ class MainFragment : Fragment() {
         binding.viewModel = mViewModel
 
         binding.buttonScan.setOnClickListener {
-            (activity as PinsActivity).checkPermission()
+            (activity as MainActivity).checkPermission()
         }
 
         binding.buttonEmail.setOnClickListener {
         }
 
-        mSharedViewModel = activity?.run {
+        sharedViewModel = activity?.run {
             ViewModelProviders.of(this, SharedViewModelFactory(this)).get(SharedViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
@@ -58,7 +58,8 @@ class MainFragment : Fragment() {
         super.onResume()
         (activity as AppCompatActivity).supportActionBar?.hide()
 
-        if (!mSharedViewModel.isDataEmpty.get()) {
+        Logger.d(TAG, "isConfigure: ${sharedViewModel.isConfigured.get()}")
+        if (sharedViewModel.isConfigured.get()) {
             findNavController().navigate(R.id.pinsFragment)
         }
     }
@@ -71,10 +72,6 @@ class MainFragment : Fragment() {
     companion object {
 
         private const val TAG = "MainFragment"
-
-        private const val CAMERA_REQUEST_CODE = 1
-
-        private const val SCAN_QR_CODE = 2
 
     }
 }

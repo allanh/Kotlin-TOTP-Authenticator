@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import androidx.core.content.edit
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,11 +29,26 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
     val showQRCodeErrorEvent = SingleLiveEvent<Any>()
     var pins = MutableLiveData<MutableList<Pin>>()
     var isDataEmpty = ObservableBoolean(false)
+    var isConfigured = ObservableBoolean(false)
 
     init {
+        loadPreferences()
         secrets = getSecretList()
         updatePins()
         Logger.d(TAG, "secrets size: ${secrets.size}")
+    }
+
+    private fun loadPreferences() {
+        activity?.getPreferences(Context.MODE_PRIVATE)?.let {
+            isConfigured.set(it.getBoolean(IS_CONFIGURED_KEY, false))
+        }
+    }
+
+    fun setConfigured(configured: Boolean) {
+        activity?.getPreferences(Context.MODE_PRIVATE)?.edit()?.let {
+            it.putBoolean(IS_CONFIGURED_KEY, configured).commit()
+            isConfigured.set(configured)
+        }
     }
 
     private fun getSecretList(): MutableList<Secret> {
@@ -174,5 +190,6 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
         private val kAccount = "acc"
         private val kTime = "time"
         private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+        private val IS_CONFIGURED_KEY = "is_configured"
     }
 }

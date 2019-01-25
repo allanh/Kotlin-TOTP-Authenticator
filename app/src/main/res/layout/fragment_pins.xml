@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/darker_gray"
-            tools:context="com.udnshopping.udnsauthorizer.PinsActivity">
+            tools:context="com.udnshopping.udnsauthorizer.MainActivity">
 
         <TextView
                 android:text="@string/pins_hint"

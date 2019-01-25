@@ -42,7 +42,7 @@ class ConfigFragment  : Fragment() {
 
         binding.configToolbar.setNavigationOnClickListener {
             Logger.d(TAG, "Navigation click")
-            activity?.onBackPressed()
+            activity?.supportFragmentManager?.popBackStack()
         }
 
 //        (activity as AppCompatActivity).setSupportActionBar(binding.configToolbar)
@@ -60,7 +60,7 @@ class ConfigFragment  : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             // GoTo config
-            findNavController()
+            findNavController().navigate(R.id.pinsFragment)
 //            findNavController(R.id.nav_host_fragment).navigate(R.id.action_mainFragment_to_configFragment)
             true
         }

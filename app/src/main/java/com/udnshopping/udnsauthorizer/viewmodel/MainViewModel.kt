@@ -1,6 +1,7 @@
 package com.udnshopping.udnsauthorizer.viewmodel
 
 import android.app.Activity
+import android.content.Context
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.udnshopping.udnsauthorizer.BuildConfig
@@ -70,5 +71,6 @@ class MainViewModel(var activity: Activity?) {
 
         // Remote Config keys
         private const val EMAIL_INPUT_CONFIG_KEY = "email_input_enabled"
+
     }
 }

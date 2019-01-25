@@ -19,11 +19,13 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
+import com.udnshopping.udnsauthorizer.extensions.IOnBackPressed
 import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 
-class PinsActivity : AppCompatActivity() {
+
+class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration : AppBarConfiguration
     private lateinit var mViewModel: SharedViewModel
@@ -57,7 +59,7 @@ class PinsActivity : AppCompatActivity() {
             } catch (e: Resources.NotFoundException) {
                 Integer.toString(destination.id)
             }
-            Toast.makeText(this@PinsActivity, "Navigated to $dest",
+            Toast.makeText(this@MainActivity, "Navigated to $dest",
                 Toast.LENGTH_SHORT).show()
             Log.d("NavigationActivity", "Navigated to $dest")
         }
@@ -72,17 +74,17 @@ class PinsActivity : AppCompatActivity() {
         Logger.d(TAG, "onCreate done")
     }
 
-//    override fun onBackPressed() {
-//        val fragments = supportFragmentManager.backStackEntryCount
-//        Logger.d(TAG, "fragments: $fragments")
-//        if (fragments == 1) {
-//            finish()
-//        } else if (fragments > 1) {
-//            supportFragmentManager.popBackStack()
-//        } else {
-//            super.onBackPressed()
-//        }
-//    }
+    override fun onBackPressed() {
+        val host: NavHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment? ?: return
+        val currentId = host.navController.currentDestination?.id ?: 0
+
+        if (currentId == R.id.pinsFragment) {
+            finish()
+        } else {
+            super.onBackPressed()
+        }
+    }
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp();
@@ -102,6 +104,8 @@ class PinsActivity : AppCompatActivity() {
                     return
                 }
                 mViewModel.addData(data.extras)
+                mViewModel.setConfigured(true)
+                findNavController(R.id.nav_host_fragment).navigate(R.id.pinsFragment)
             }
             else -> { }
         }
@@ -183,20 +187,20 @@ class PinsActivity : AppCompatActivity() {
             != PackageManager.PERMISSION_GRANTED
         ) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this@PinsActivity,
+                    this@MainActivity,
                     android.Manifest.permission.CAMERA
                 )
             ) {
                 // try again to request the permission.
                 ActivityCompat.requestPermissions(
-                    this@PinsActivity,
+                    this@MainActivity,
                     arrayOf(android.Manifest.permission.CAMERA),
                     CAMERA_REQUEST_CODE
                 )
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(
-                    this@PinsActivity,
+                    this@MainActivity,
                     arrayOf(android.Manifest.permission.CAMERA),
                     CAMERA_REQUEST_CODE
                 )
@@ -218,7 +222,7 @@ class PinsActivity : AppCompatActivity() {
 
     companion object {
 
-        private const val TAG = "PinsActivity"
+        private const val TAG = "MainActivity"
 
         private const val CAMERA_REQUEST_CODE = 1
 

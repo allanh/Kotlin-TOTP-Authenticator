@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -14,9 +15,10 @@ import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 import androidx.databinding.DataBindingUtil
 import com.udnshopping.udnsauthorizer.databinding.FragmentPinsBinding
+import com.udnshopping.udnsauthorizer.extensions.IOnBackPressed
 
 
-class PinsFragment : Fragment() {
+class PinsFragment : Fragment(), IOnBackPressed {
 
     private lateinit var viewModel: SharedViewModel
     private lateinit var binding: FragmentPinsBinding
@@ -85,7 +87,7 @@ class PinsFragment : Fragment() {
 
         R.id.action_camera -> {
             // User chose the "Settings" item, show the app settings UI...
-            (activity as PinsActivity).scan()
+            (activity as MainActivity).scan()
             true
         }
         else -> {
@@ -94,6 +96,8 @@ class PinsFragment : Fragment() {
             super.onOptionsItemSelected(item)
         }
     }
+
+    override fun onBackPressed() = false
 
     private fun setListView(pins: MutableList<Pin>?) {
         var fragmentContext = context as Context
