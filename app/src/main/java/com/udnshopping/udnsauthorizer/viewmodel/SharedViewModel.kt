@@ -28,28 +28,16 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
     val showQRCodeErrorEvent = SingleLiveEvent<Any>()
     var pins = MutableLiveData<MutableList<Pin>>()
     var isDataEmpty = ObservableBoolean(false)
-    var isConfigured = ObservableBoolean(false)
 
     init {
-        loadPreferences()
         secrets = getSecretList()
         updatePins()
         Logger.d(TAG, "secrets size: ${secrets.size}")
     }
 
-    private fun loadPreferences() {
-        activity?.getPreferences(Context.MODE_PRIVATE)?.let {
-            isConfigured.set(it.getBoolean(IS_CONFIGURED_KEY, false))
-        }
-    }
-
-    fun setConfigured(configured: Boolean) {
-        activity?.getPreferences(Context.MODE_PRIVATE)?.edit()?.let {
-            it.putBoolean(IS_CONFIGURED_KEY, configured).commit()
-            isConfigured.set(configured)
-        }
-    }
-
+    /**
+     * Get the secret list from shared preferences.
+     */
     private fun getSecretList(): MutableList<Secret> {
         val type = object : TypeToken<List<Secret>>() {}.type
         val preferences = activity?.getPreferences(Context.MODE_PRIVATE)
@@ -59,18 +47,26 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
 
     fun getPinList() = pins.value
 
+    /**
+     * Removes an element at the specified [position] from the secret and pin list.
+     */
     @Synchronized fun removeAt(position: Int) {
         Logger.d(TAG, "removeAt: $position")
         if (position >= 0 && position < secrets.size) {
             secrets.removeAt(position)
             Logger.d(TAG, "removed secret list size: ${secrets.size}")
+
             var tempPins = pins.value?.toMutableList()
             tempPins?.removeAt(position)
+            isDataEmpty.set(tempPins?.isEmpty() ?: true)
             pins.value = tempPins
             Logger.d(TAG, "removed pin list size: ${pins.value?.size}")
         }
     }
 
+    /**
+     * Add an [extra] data to secrets.
+     */
     fun addData(extra: Bundle?) {
         val auth = extra?.getString(kAuth)
         var secret: Secret? = null
@@ -87,12 +83,11 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
                     val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
                     Logger.d(TAG, "secretInfo: ${secretInfo?.toString()}")
 
+                    // Change the data format
                     if (!(secretInfo == null || secretInfo.isEmpty())) {
                         val time = secretInfo[kTime]
-                        val timeFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
-                        val date = timeFormat.parse(time)
-                        val dateString = DATE_FORMAT.format(date)
-
+                        val date = ORIGIN_DATE_FORMAT.parse(time)
+                        val dateString = PIN_DATE_FORMAT.format(date)
                         secret = Secret(secretInfo[kSecret], secretInfo[kAccount], dateString)
                     }
                 } else {
@@ -122,52 +117,57 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
         }
     }
 
-
+    /**
+     * Update the pin list.
+     */
     fun updatePins() {
-        var pinList = mutableListOf<Pin>()
+        val pinList = mutableListOf<Pin>()
+        val lastTimeMap = mutableMapOf<String, Long>()
 
         val config = TimeBasedOneTimePasswordConfig(
             codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
             timeStep = 60, timeStepUnit = TimeUnit.SECONDS
         )
         for (secret in secrets) {
-            if (secret.key.isNotEmpty() && secret.value.isNotEmpty()) {
+            if (secret.key.isNotEmpty() && secret.value.isNotEmpty() && secret.date.isNotEmpty()) {
                 val timeBasedOneTimePasswordGenerator =
                     TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
                 val pinString = timeBasedOneTimePasswordGenerator.generate()
                 val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
                 val pin = Pin(pinString, secret.value, progress, secret.date)
                 pinList.add(pin)
-            }
-        }
 
-        updatePinListState(pinList)
-    }
-
-    private fun updatePinListState(pinList: MutableList<Pin>) {
-
-        var pinMap = mutableMapOf<String, Pin>()
-        var tempPins = pinList.toMutableList()
-
-        for (i in tempPins.size-1 downTo 0) {
-            var key = tempPins[i].value
-            if (!pinMap.containsKey(key)) {
-                pinMap[key] = tempPins[i]
-            } else {
-                val lastPin = pinMap[key] as Pin
-                val lastDate = DATE_FORMAT.parse(lastPin.date)
-                val pinDate = DATE_FORMAT.parse(tempPins[i].date)
-                //Logger.d(TAG, "LastDate: ${lastDate.time} PinDate: ${pinDate.time}")
-                if (lastDate.time > pinDate.time) {
-                    tempPins[i].isValid = false
+                // Update the last time map
+                val pinTimeStamp = PIN_DATE_FORMAT.parse(secret.date).time
+                if (lastTimeMap.containsKey(secret.value)) {
+                    lastTimeMap[secret.value]?.let {
+                        if (it < pinTimeStamp)
+                            lastTimeMap[secret.value] = pinTimeStamp
+                    }
+                } else {
+                    lastTimeMap[secret.value] = pinTimeStamp
                 }
             }
         }
+        updatePinListState(lastTimeMap, pinList)
+    }
 
-        isDataEmpty.set(tempPins.size == 0)
+    /**
+     * Update the pins state with the [lastTimeMap].
+     */
+    private fun updatePinListState(lastTimeMap: MutableMap<String, Long>, pinList: MutableList<Pin>) {
+        val tempPins = pinList.toMutableList()
+        for (pin in tempPins) {
+            val pinTime = PIN_DATE_FORMAT.parse(pin.date).time
+            pin.isValid = (pinTime == lastTimeMap[pin.value])
+        }
+        isDataEmpty.set(tempPins.isEmpty())
         pins.value = tempPins
     }
 
+    /**
+     * Save the secrets to shared preferences.
+     */
     fun saveData() {
         Logger.d(TAG, "save data: ${secrets.size}")
         //--SAVE Data
@@ -188,7 +188,8 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
         private val kSecretList = "secretList"
         private val kAccount = "acc"
         private val kTime = "time"
-        private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-        private val IS_CONFIGURED_KEY = "is_configured"
+
+        private val ORIGIN_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")
+        private val PIN_DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     }
 }

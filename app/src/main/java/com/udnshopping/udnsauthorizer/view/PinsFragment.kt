@@ -14,6 +14,7 @@ import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback
 import com.udnshopping.udnsauthorizer.adapter.SecretAdapter
@@ -57,21 +58,12 @@ class PinsFragment : Fragment(), IOnBackPressed {
 
         Logger.d(TAG, "pin size: ${viewModel.getPinList()?.size}")
         viewModel.pins.observe(this, Observer {
-//            Logger.d(TAG, "New pin size: ${it.size}")
 
             (binding.pinsRecyclerView.adapter as SecretAdapter).updateData(it)
-
             if (it.size == 0) {
                 if (isPosted) isRefreshing = false
-                //findNavController().navigate(R.id.mainFragment)
-                binding.tvPinsHint.visibility = View.VISIBLE
-                binding.pinsRecyclerView.visibility = View.GONE
             } else {
                 if (!isPosted) isRefreshing = true
-                binding.tvPinsHint.visibility = View.GONE
-                binding.pinsRecyclerView.visibility = View.VISIBLE
-                //updateListView(viewModel.getPinList())
-                //(binding.pinsRecyclerView.adapter as SecretAdapter).updateData(it)
             }
         })
         binding.viewModel = viewModel

@@ -36,7 +36,11 @@ class MainFragment : Fragment() {
         binding.viewModel = mViewModel
 
         binding.buttonScan.setOnClickListener {
-            (activity as MainActivity).checkPermission()
+            if (sharedViewModel.isDataEmpty.get()) {
+                (activity as MainActivity).checkPermission()
+            } else {
+                findNavController().navigate(R.id.pinsFragment)
+            }
         }
 
         binding.buttonEmail.setOnClickListener {
@@ -56,8 +60,7 @@ class MainFragment : Fragment() {
         super.onResume()
         (activity as AppCompatActivity).supportActionBar?.hide()
 
-        Logger.d(TAG, "isConfigure: ${sharedViewModel.isConfigured.get()}")
-        if (sharedViewModel.isConfigured.get()) {
+        if (!sharedViewModel.isDataEmpty.get()) {
             findNavController().navigate(R.id.pinsFragment)
         }
     }

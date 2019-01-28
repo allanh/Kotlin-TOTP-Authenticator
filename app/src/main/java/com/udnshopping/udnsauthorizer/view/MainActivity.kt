@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.udnshopping.udnsauthorizer.R
@@ -81,15 +82,24 @@ class MainActivity : AppCompatActivity() {
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment? ?: return
         val currentId = host.navController.currentDestination?.id ?: 0
 
-        if (currentId == R.id.pinsFragment) {
-            finish()
-        } else {
-            super.onBackPressed()
+        when (currentId) {
+            R.id.mainFragment, R.id.pinsFragment -> {
+                mViewModel.saveData()
+                finish()
+            }
+            else -> super.onBackPressed()
         }
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp();
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (mViewModel.isDataEmpty.get()) {
+            findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
+        }
     }
 
     override fun onStop() {
@@ -100,13 +110,12 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        when(requestCode) {
+        when (requestCode) {
             SCAN_QR_CODE -> {
                 if (data == null) {
                     return
                 }
                 mViewModel.addData(data.extras)
-                mViewModel.setConfigured(true)
                 findNavController(R.id.nav_host_fragment).navigate(R.id.pinsFragment)
             }
             else -> { }
