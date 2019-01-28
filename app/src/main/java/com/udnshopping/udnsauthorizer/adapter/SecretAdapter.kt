@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.adapter
 
 import android.content.Context
 import android.graphics.Color
@@ -8,16 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.extensions.setProgressTintColor
-import com.udnshopping.udnsauthorizer.data.Pin
-import com.udnshopping.udnsauthorizer.utilities.Logger
-import java.text.SimpleDateFormat
-import java.util.*
+import com.udnshopping.udnsauthorizer.model.Pin
 
 class SecretAdapter(private var items: List<Pin>?, private val context: Context) :
     androidx.recyclerview.widget.RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
-
-    //private var mProgress = 0
 
     class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tvSecretType: TextView = view.findViewById(R.id.tv_secret_type)
@@ -30,7 +26,13 @@ class SecretAdapter(private var items: List<Pin>?, private val context: Context)
 
     // Inflates the item views
     override fun onCreateViewHolder(viewGroup: ViewGroup, position: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.secret_list_item, viewGroup, false))
+        return ViewHolder(
+            LayoutInflater.from(context).inflate(
+                R.layout.secret_list_item,
+                viewGroup,
+                false
+            )
+        )
     }
 
     // Binds each animal in the ArrayList to a view
@@ -46,7 +48,7 @@ class SecretAdapter(private var items: List<Pin>?, private val context: Context)
             viewHolder.tvDate.text = it[position].date
 
             // Progress
-            val progress = (30 - (it[position].progress % 30)) * 100 / 30
+            val progress = (60 - (it[position].progress % 60)) * 100 / 60
             //Logger.d("adapter", "progress: $progress")
             viewHolder.progressBar.progress = progress
 

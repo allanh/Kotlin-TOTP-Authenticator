@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.view
 
 import android.content.Context
 import android.os.Bundle
@@ -9,13 +9,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.lifecycle.Observer
-import com.udnshopping.udnsauthorizer.data.Pin
+import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 import androidx.databinding.DataBindingUtil
+import com.udnshopping.udnsauthorizer.R
+import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback
+import com.udnshopping.udnsauthorizer.adapter.SecretAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentPinsBinding
-import com.udnshopping.udnsauthorizer.extensions.IOnBackPressed
+import com.udnshopping.udnsauthorizer.callback.IOnBackPressed
 
 
 class PinsFragment : Fragment(), IOnBackPressed {
@@ -28,7 +31,9 @@ class PinsFragment : Fragment(), IOnBackPressed {
         set(value) {
             synchronized(value) {
                 if (value) {
-                    handler.postDelayed(updateThread, UPDATE_TIME)
+                    handler.postDelayed(updateThread,
+                        UPDATE_TIME
+                    )
                     isPosted = true
                 } else if (isPosted) {
                     handler.removeCallbacks(updateThread)
@@ -43,7 +48,8 @@ class PinsFragment : Fragment(), IOnBackPressed {
         Logger.d(TAG, "onCreate")
 
         binding =
-            DataBindingUtil.inflate<FragmentPinsBinding>(inflater, R.layout.fragment_pins, container, false)
+            DataBindingUtil.inflate<FragmentPinsBinding>(inflater,
+                R.layout.fragment_pins, container, false)
 
         viewModel = activity?.run {
             ViewModelProviders.of(this, SharedViewModelFactory(this)).get(SharedViewModel::class.java)
@@ -129,6 +135,7 @@ class PinsFragment : Fragment(), IOnBackPressed {
     override fun onResume() {
         super.onResume()
         isRefreshing = true
+        (activity as AppCompatActivity).supportActionBar?.show()
     }
 
     override fun onStop() {

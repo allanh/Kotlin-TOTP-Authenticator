@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.data
+package com.udnshopping.udnsauthorizer.model
 
 import com.google.gson.annotations.SerializedName
 

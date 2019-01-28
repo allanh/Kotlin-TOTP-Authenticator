@@ -21,4 +21,7 @@
         2. 將郵件中的 QR 碼置於橘色框線中。\n\n
         3. 如果 QR 碼正確，會自動產生驗證碼。
     </string>
+    <string name="send_qrcode_title">發送 QR 碼</string>
+    <string name="email_hint">請輸入信箱</string>
+    <string name="send_qrcode_context">我們將會將 QR 碼寄到您輸入的信箱</string>
 </resources>

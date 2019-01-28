@@ -20,14 +20,17 @@
             app:startDestination="@id/mainFragment">
 
 
-    <fragment android:id="@+id/mainFragment" android:name="com.udnshopping.udnsauthorizer.MainFragment"
+    <fragment android:id="@+id/mainFragment" android:name="com.udnshopping.udnsauthorizer.view.MainFragment"
               android:label="fragment_main" tools:layout="@layout/fragment_main">
         <action android:id="@+id/action_mainFragment_to_pinsFragment" app:destination="@id/pinsFragment" app:popUpToInclusive="true"/>
+        <action android:id="@+id/action_mainFragment_to_sendCodeFragment" app:destination="@id/sendCodeFragment"/>
     </fragment>
-    <fragment android:id="@+id/pinsFragment" android:name="com.udnshopping.udnsauthorizer.PinsFragment"
+    <fragment android:id="@+id/pinsFragment" android:name="com.udnshopping.udnsauthorizer.view.PinsFragment"
               android:label="PinsFragment">
         <action android:id="@+id/action_pinsFragment_to_configFragment" app:destination="@id/configFragment"/>
     </fragment>
-    <fragment android:id="@+id/configFragment" android:name="com.udnshopping.udnsauthorizer.ConfigFragment"
+    <fragment android:id="@+id/configFragment" android:name="com.udnshopping.udnsauthorizer.view.ConfigFragment"
               android:label="fragment_config" tools:layout="@layout/fragment_config"/>
+    <fragment android:id="@+id/sendCodeFragment" android:name="com.udnshopping.udnsauthorizer.view.SendCodeFragment"
+              android:label="SendCodeFragment"/>
 </navigation>

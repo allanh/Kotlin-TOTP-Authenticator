@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,6 +11,7 @@ import com.udnshopping.udnsauthorizer.viewmodel.MainViewModel
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
+import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
@@ -29,7 +30,8 @@ class MainFragment : Fragment() {
         Logger.d(TAG, "onCreate")
 
         var binding =
-            DataBindingUtil.inflate<FragmentMainBinding>(inflater, R.layout.fragment_main, container, false)
+            DataBindingUtil.inflate<FragmentMainBinding>(inflater,
+                R.layout.fragment_main, container, false)
         mViewModel = MainViewModel(activity)
         binding.viewModel = mViewModel
 
@@ -38,6 +40,7 @@ class MainFragment : Fragment() {
         }
 
         binding.buttonEmail.setOnClickListener {
+            findNavController().navigate(R.id.sendCodeFragment)
         }
 
         sharedViewModel = activity?.run {
@@ -47,11 +50,6 @@ class MainFragment : Fragment() {
         Logger.d(TAG, "onCreate done")
 
         return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        Logger.d(TAG, "onViewCreated")
     }
 
     override fun onResume() {
@@ -66,7 +64,6 @@ class MainFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        (activity as AppCompatActivity).supportActionBar?.show()
     }
 
     companion object {

@@ -1,22 +1,20 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.view
 
 import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.udnshopping.udnsauthorizer.data.Config
-import androidx.recyclerview.widget.RecyclerView
-import android.text.method.TextKeyListener.clear
+import com.udnshopping.udnsauthorizer.model.Config
 import android.view.MenuInflater
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.udnshopping.udnsauthorizer.BuildConfig
+import com.udnshopping.udnsauthorizer.R
+import com.udnshopping.udnsauthorizer.adapter.ConfigAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentConfigBinding
-import com.udnshopping.udnsauthorizer.databinding.FragmentPinsBinding
 import com.udnshopping.udnsauthorizer.utilities.Logger
-import kotlinx.android.synthetic.main.fragment_config.*
 
 
 class ConfigFragment  : Fragment() {
@@ -31,14 +29,16 @@ class ConfigFragment  : Fragment() {
 
 
         var binding =
-                DataBindingUtil.inflate<FragmentConfigBinding>(inflater, R.layout.fragment_config, container, false)
+                DataBindingUtil.inflate<FragmentConfigBinding>(inflater,
+                    R.layout.fragment_config, container, false)
 
         var configs = Config(mapOf("version" to BuildConfig.VERSION_NAME))
 
         // Creates a vertical Layout Manager
         binding.configRecyclerView.layoutManager = LinearLayoutManager(activity)
         // Access the RecyclerView Adapter and load the data into it
-        binding.configRecyclerView.adapter = ConfigAdapter(configs.config, activity as Context)
+        binding.configRecyclerView.adapter =
+                ConfigAdapter(configs.config, activity as Context)
 
         binding.configToolbar.setNavigationOnClickListener {
             Logger.d(TAG, "Navigation click")
@@ -79,11 +79,6 @@ class ConfigFragment  : Fragment() {
     override fun onResume() {
         super.onResume()
         (activity as AppCompatActivity).supportActionBar?.hide()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).supportActionBar?.show()
     }
 
     companion object {

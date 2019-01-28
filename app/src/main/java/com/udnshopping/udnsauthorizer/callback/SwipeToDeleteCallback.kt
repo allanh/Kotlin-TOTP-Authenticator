@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.callback
 
 import android.content.Context
 import android.graphics.Canvas
@@ -8,13 +8,15 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.ColorDrawable
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.ItemTouchHelper
+import com.udnshopping.udnsauthorizer.R
 
 
 abstract class SwipeToDeleteCallback(context: Context) : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
-    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_delete_white_24)
+    private val deleteIcon = ContextCompat.getDrawable(context,
+        R.drawable.ic_delete_white_24
+    )
     private val intrinsicWidth = deleteIcon!!.intrinsicWidth
     private val intrinsicHeight = deleteIcon!!.intrinsicHeight
     private val background = ColorDrawable()

@@ -7,7 +7,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:showIn="@layout/activity_scan"
-        tools:context=".ScanActivity">
+        tools:context=".view.ScanActivity">
 
     <SurfaceView
             android:layout_width="0dp"

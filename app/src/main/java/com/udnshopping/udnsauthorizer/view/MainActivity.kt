@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.view
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -18,8 +18,8 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
-import com.udnshopping.udnsauthorizer.extensions.IOnBackPressed
 import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
@@ -33,7 +33,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Logger.d(TAG, "onCreate")
-        var binding = DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+        var binding = DataBindingUtil.setContentView<ActivityMainBinding>(this,
+            R.layout.activity_main
+        )
 
         //setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.my_toolbar))

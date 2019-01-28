@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.view
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -14,6 +14,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
 import android.view.View
 import android.view.ViewGroup
+import com.udnshopping.udnsauthorizer.R
 
 class ScanActivity : AppCompatActivity() {
     private var cameraView: SurfaceView? = null

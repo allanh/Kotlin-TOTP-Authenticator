@@ -1,12 +1,12 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.view
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import androidx.core.content.ContextCompat
 import android.view.View
+import com.udnshopping.udnsauthorizer.R
 
 
 class Box internal constructor(context: Context) : View(context) {

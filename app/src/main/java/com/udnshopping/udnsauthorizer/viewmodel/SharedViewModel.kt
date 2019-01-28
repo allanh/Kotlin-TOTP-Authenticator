@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import androidx.core.content.edit
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,8 +12,8 @@ import com.google.gson.reflect.TypeToken
 import com.marcelkliemannel.kotlinonetimepassword.HmacAlgorithm
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordConfig
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordGenerator
-import com.udnshopping.udnsauthorizer.data.Pin
-import com.udnshopping.udnsauthorizer.data.Secret
+import com.udnshopping.udnsauthorizer.model.Pin
+import com.udnshopping.udnsauthorizer.model.Secret
 import com.udnshopping.udnsauthorizer.extensions.SingleLiveEvent
 import com.udnshopping.udnsauthorizer.utilities.Logger
 import com.udnshopping.udnsauthorizer.utilities.ThreeDESUtil
@@ -129,7 +128,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
 
         val config = TimeBasedOneTimePasswordConfig(
             codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
-            timeStep = 30, timeStepUnit = TimeUnit.SECONDS
+            timeStep = 60, timeStepUnit = TimeUnit.SECONDS
         )
         for (secret in secrets) {
             if (secret.key.isNotEmpty() && secret.value.isNotEmpty()) {

@@ -1,16 +1,12 @@
-package com.udnshopping.udnsauthorizer
+package com.udnshopping.udnsauthorizer.adapter
 
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.udnshopping.udnsauthorizer.data.Config
-import com.udnshopping.udnsauthorizer.extensions.setProgressTintColor
+import com.udnshopping.udnsauthorizer.R
 
 class ConfigAdapter(private val items: Map<String, String>?, private val context: Context) :
     RecyclerView.Adapter<ConfigAdapter.ViewHolder>() {
@@ -30,7 +26,13 @@ class ConfigAdapter(private val items: Map<String, String>?, private val context
 
     // Inflates the item views
     override fun onCreateViewHolder(viewGroup: ViewGroup, position: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.config_list_item, viewGroup, false))
+        return ViewHolder(
+            LayoutInflater.from(context).inflate(
+                R.layout.config_list_item,
+                viewGroup,
+                false
+            )
+        )
     }
 
     // Binds each animal in the ArrayList to a view
