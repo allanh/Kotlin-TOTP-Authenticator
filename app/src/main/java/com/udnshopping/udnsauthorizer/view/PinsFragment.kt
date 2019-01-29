@@ -10,11 +10,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.lifecycle.Observer
 import com.udnshopping.udnsauthorizer.model.Pin
-import com.udnshopping.udnsauthorizer.utilities.Logger
+import com.udnshopping.udnsauthorizer.utility.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 import androidx.databinding.DataBindingUtil
-import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback
 import com.udnshopping.udnsauthorizer.adapter.SecretAdapter

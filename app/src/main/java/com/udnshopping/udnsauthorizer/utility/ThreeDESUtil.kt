@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.utilities
+package com.udnshopping.udnsauthorizer.utility
 
 import android.util.Base64
 import java.lang.Exception

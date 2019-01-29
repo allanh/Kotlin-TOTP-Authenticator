@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.extensions
+package com.udnshopping.udnsauthorizer.extension
 
 import androidx.annotation.MainThread
 import androidx.annotation.Nullable

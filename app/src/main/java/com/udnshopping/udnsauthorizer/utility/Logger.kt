@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.utilities
+package com.udnshopping.udnsauthorizer.utility
 
 import android.util.Log
 import com.udnshopping.udnsauthorizer.BuildConfig
@@ -10,22 +10,27 @@ import com.udnshopping.udnsauthorizer.BuildConfig
  */
 object Logger {
     fun e(tag: String, message: String) {
-        if (BuildConfig.DEBUG) Log.e(tag, message)
+        if (BuildConfig.DEBUG)
+            Log.e(tag, message)
     }
 
     fun w(tag: String, message: String) {
-        if (BuildConfig.DEBUG) Log.w(tag, message)
+        if (BuildConfig.DEBUG)
+            Log.w(tag, message)
     }
 
     fun i(tag: String, message: String) {
-        if (BuildConfig.DEBUG) Log.i(tag, message)
+        if (BuildConfig.DEBUG)
+            Log.i(tag, message)
     }
 
     fun d(tag: String, message: String) {
-        if (BuildConfig.DEBUG) Log.d(tag, message)
+        if (BuildConfig.DEBUG)
+            Log.d(tag, message)
     }
 
     fun v(tag: String, message: String) {
-        if (BuildConfig.DEBUG) Log.v(tag, message)
+        if (BuildConfig.DEBUG)
+            Log.v(tag, message)
     }
 }

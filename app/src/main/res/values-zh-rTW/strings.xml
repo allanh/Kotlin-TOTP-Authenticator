@@ -24,4 +24,5 @@
     <string name="send_qrcode_title">發送 QR 碼</string>
     <string name="email_hint">請輸入信箱</string>
     <string name="send_qrcode_context">我們將會將 QR 碼寄到您輸入的信箱</string>
+    <string name="preference_file_key">com.udnshopping.udnsauthorizer.udn_prefs</string>
 </resources>

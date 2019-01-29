@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.udnshopping.udnsauthorizer.R
-import com.udnshopping.udnsauthorizer.extensions.setProgressTintColor
+import com.udnshopping.udnsauthorizer.extension.setProgressTintColor
 import com.udnshopping.udnsauthorizer.model.Pin
 
 class SecretAdapter(private var items: List<Pin>?, private val context: Context) :

@@ -1,12 +1,11 @@
 package com.udnshopping.udnsauthorizer.viewmodel
 
 import android.app.Activity
-import android.content.Context
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
-import com.udnshopping.udnsauthorizer.utilities.Logger
+import com.udnshopping.udnsauthorizer.utility.Logger
 import androidx.databinding.ObservableBoolean
 
 

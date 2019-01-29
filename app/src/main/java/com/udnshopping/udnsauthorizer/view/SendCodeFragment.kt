@@ -12,12 +12,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.FragmentSendCodeBinding
-import com.udnshopping.udnsauthorizer.utilities.Logger
+import com.udnshopping.udnsauthorizer.utility.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SendCodeViewModel
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView
-
-
+import com.udnshopping.udnsauthorizer.model.KeyUpEvent
+import com.udnshopping.udnsauthorizer.repository.QRCodeRepository
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 
 
 class SendCodeFragment : Fragment() {
@@ -35,10 +35,10 @@ class SendCodeFragment : Fragment() {
         mBinding =
             DataBindingUtil.inflate<FragmentSendCodeBinding>(inflater,
                 R.layout.fragment_send_code, container, false)
-        mViewModel = SendCodeViewModel()
+        mViewModel = SendCodeViewModel(QRCodeRepository())
         mBinding.viewModel = mViewModel
 
-
+        EventBus.getDefault().register(this)
 
         Logger.d(TAG, "onCreate done")
         return mBinding.root
@@ -53,8 +53,25 @@ class SendCodeFragment : Fragment() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
+    /**
+     * Called by eventBus when an event occurs
+     */
+    @Subscribe
+    fun onKeyEvent(event: KeyUpEvent) {
+        when (event.keyCode) {
+            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
+                val email = mBinding.etEmail.text.toString()
+                if (!email.isEmpty()) {
+                    //mViewModel.sendEmail(email)
+                }
+            }
+            else -> {}
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        EventBus.getDefault().unregister(this)
     }
 
     private fun openSoftKeyboard(context: Context, view: View) {

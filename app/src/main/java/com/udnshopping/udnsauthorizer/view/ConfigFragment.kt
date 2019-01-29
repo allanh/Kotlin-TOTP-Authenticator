@@ -14,7 +14,7 @@ import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.adapter.ConfigAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentConfigBinding
-import com.udnshopping.udnsauthorizer.utilities.Logger
+import com.udnshopping.udnsauthorizer.utility.Logger
 
 
 class ConfigFragment  : Fragment() {

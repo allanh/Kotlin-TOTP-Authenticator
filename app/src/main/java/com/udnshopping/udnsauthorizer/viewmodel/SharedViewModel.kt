@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,11 +13,12 @@ import com.google.gson.reflect.TypeToken
 import com.marcelkliemannel.kotlinonetimepassword.HmacAlgorithm
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordConfig
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordGenerator
+import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.model.Secret
-import com.udnshopping.udnsauthorizer.extensions.SingleLiveEvent
-import com.udnshopping.udnsauthorizer.utilities.Logger
-import com.udnshopping.udnsauthorizer.utilities.ThreeDESUtil
+import com.udnshopping.udnsauthorizer.extension.SingleLiveEvent
+import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ThreeDESUtil
 import org.apache.commons.codec.binary.Base32
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,8 +33,9 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
 
     init {
         secrets = getSecretList()
-        updatePins()
         Logger.d(TAG, "secrets size: ${secrets.size}")
+        isDataEmpty.set(secrets.isEmpty())
+        updatePins()
     }
 
     /**
@@ -40,8 +43,13 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
      */
     private fun getSecretList(): MutableList<Secret> {
         val type = object : TypeToken<List<Secret>>() {}.type
-        val preferences = activity?.getPreferences(Context.MODE_PRIVATE)
+        val preferences = activity?.getSharedPreferences(
+            activity?.getString(R.string.preference_file_key),
+            Context.MODE_PRIVATE
+        )
+        Logger.d(TAG, "preferences: ${preferences.toString()}")
         val json = preferences?.getString(kSecretList, "") ?: ""
+        Logger.d(TAG, "json: $json")
         return if (json.isNotBlank()) Gson().fromJson(json, type) else mutableListOf()
     }
 
@@ -171,10 +179,13 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
     fun saveData() {
         Logger.d(TAG, "save data: ${secrets.size}")
         //--SAVE Data
-        val preferences = activity?.getPreferences(Context.MODE_PRIVATE)
+        val preferences = activity?.getSharedPreferences(
+            activity?.getString(R.string.preference_file_key),
+            Context.MODE_PRIVATE
+        )
         val editor = preferences?.edit()
         val type = object : TypeToken<List<Secret>>() {}.type
-        val json = Gson().toJson(secrets, type)
+        val json = Gson().toJson(secrets.toList(), type)
         editor?.putString(kSecretList, json)?.apply()
         editor?.commit()
     }
