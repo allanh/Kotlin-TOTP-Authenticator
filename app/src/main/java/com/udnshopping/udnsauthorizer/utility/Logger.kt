@@ -9,27 +9,27 @@ import com.udnshopping.udnsauthorizer.BuildConfig
  * you code is running in DEBUG or RELEASE build.
  */
 object Logger {
-    fun e(tag: String, message: String) {
+    fun e(tag: String, message: String?) {
         if (BuildConfig.DEBUG)
             Log.e(tag, message)
     }
 
-    fun w(tag: String, message: String) {
+    fun w(tag: String, message: String?) {
         if (BuildConfig.DEBUG)
             Log.w(tag, message)
     }
 
-    fun i(tag: String, message: String) {
+    fun i(tag: String, message: String?) {
         if (BuildConfig.DEBUG)
             Log.i(tag, message)
     }
 
-    fun d(tag: String, message: String) {
+    fun d(tag: String, message: String?) {
         if (BuildConfig.DEBUG)
             Log.d(tag, message)
     }
 
-    fun v(tag: String, message: String) {
+    fun v(tag: String, message: String?) {
         if (BuildConfig.DEBUG)
             Log.v(tag, message)
     }

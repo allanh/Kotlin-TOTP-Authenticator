@@ -21,6 +21,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
+import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
+import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.Logger
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
@@ -81,11 +83,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val host: NavHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment? ?: return
-        val currentId = host.navController.currentDestination?.id ?: 0
-
-        when (currentId) {
+        when (getCurrentFragmentId(R.id.nav_host_fragment)) {
             R.id.mainFragment, R.id.pinsFragment -> {
                 mViewModel.saveData()
                 finish()
@@ -105,7 +103,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (mViewModel.isDataEmpty.get()) {
+        if (!isCurrentFragment(R.id.nav_host_fragment, R.id.mainFragment)
+            && mViewModel.isDataEmpty.get()) {
             findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
         }
     }

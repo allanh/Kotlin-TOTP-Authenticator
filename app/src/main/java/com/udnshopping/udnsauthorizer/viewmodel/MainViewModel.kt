@@ -7,9 +7,11 @@ import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.utility.Logger
 import androidx.databinding.ObservableBoolean
+import androidx.lifecycle.ViewModel
+import com.udnshopping.udnsauthorizer.utility.singleArgViewModelFactory
 
 
-class MainViewModel(var activity: Activity?) {
+class MainViewModel(var activity: Activity?) : ViewModel() {
 
     private lateinit var remoteConfig: FirebaseRemoteConfig
     var isEmailInput = ObservableBoolean(false)
@@ -52,7 +54,7 @@ class MainViewModel(var activity: Activity?) {
         remoteConfig.fetch(cacheExpiration)
             .addOnCompleteListener(activity!!) { task ->
                 if (task.isSuccessful) {
-                    Logger.e(TAG, "Fetch successful")
+                    Logger.d(TAG, "Fetch successful")
                     // After config data is successfully fetched, it must be activated before newly fetched
                     // values are returned.
                     remoteConfig.activateFetched()
@@ -70,6 +72,8 @@ class MainViewModel(var activity: Activity?) {
 
         // Remote Config keys
         private const val EMAIL_INPUT_CONFIG_KEY = "email_input_enabled"
+
+        val FACTORY = singleArgViewModelFactory(::MainViewModel)
 
     }
 }

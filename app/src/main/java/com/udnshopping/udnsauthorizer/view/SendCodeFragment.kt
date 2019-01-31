@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.FragmentSendCodeBinding
 import com.udnshopping.udnsauthorizer.utility.Logger
@@ -35,7 +36,12 @@ class SendCodeFragment : Fragment() {
         mBinding =
             DataBindingUtil.inflate<FragmentSendCodeBinding>(inflater,
                 R.layout.fragment_send_code, container, false)
-        mViewModel = SendCodeViewModel(QRCodeRepository())
+        mViewModel = SendCodeViewModel(activity)
+        mViewModel.result.observe(this, Observer {
+            Logger.d(TAG, "$it")
+            activity?.onBackPressed()
+        })
+
         mBinding.viewModel = mViewModel
 
         EventBus.getDefault().register(this)
@@ -62,7 +68,7 @@ class SendCodeFragment : Fragment() {
             KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
                 val email = mBinding.etEmail.text.toString()
                 if (!email.isEmpty()) {
-                    //mViewModel.sendEmail(email)
+                    mViewModel.sendEmail(email)
                 }
             }
             else -> {}

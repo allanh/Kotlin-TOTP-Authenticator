@@ -116,7 +116,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
             showQRCodeErrorEvent.call()
         }
         if (secret != null) {
-            Logger.d(TAG, "add secret")
+            Logger.d(TAG, "add secret: ${secret.key}")
             secrets.add(secret)
 
             //--SAVE Data
@@ -137,23 +137,26 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
             timeStep = 60, timeStepUnit = TimeUnit.SECONDS
         )
         for (secret in secrets) {
-            if (secret.key.isNotEmpty() && secret.value.isNotEmpty() && secret.date.isNotEmpty()) {
+            if (secret.key.isNotEmpty() && secret.value.isNotEmpty()) {
+                val key = Base32().decode(secret.key)
                 val timeBasedOneTimePasswordGenerator =
-                    TimeBasedOneTimePasswordGenerator(Base32().decode(secret.key), config)
+                    TimeBasedOneTimePasswordGenerator(key, config)
                 val pinString = timeBasedOneTimePasswordGenerator.generate()
                 val progress = SimpleDateFormat("ss").format(Calendar.getInstance().time).toInt()
                 val pin = Pin(pinString, secret.value, progress, secret.date)
                 pinList.add(pin)
 
                 // Update the last time map
-                val pinTimeStamp = PIN_DATE_FORMAT.parse(secret.date).time
-                if (lastTimeMap.containsKey(secret.value)) {
-                    lastTimeMap[secret.value]?.let {
-                        if (it < pinTimeStamp)
-                            lastTimeMap[secret.value] = pinTimeStamp
+                if (secret.date.isNotEmpty()) {
+                    val pinTimeStamp = PIN_DATE_FORMAT.parse(secret.date).time
+                    if (lastTimeMap.containsKey(secret.value)) {
+                        lastTimeMap[secret.value]?.let {
+                            if (it < pinTimeStamp)
+                                lastTimeMap[secret.value] = pinTimeStamp
+                        }
+                    } else {
+                        lastTimeMap[secret.value] = pinTimeStamp
                     }
-                } else {
-                    lastTimeMap[secret.value] = pinTimeStamp
                 }
             }
         }
@@ -166,8 +169,12 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
     private fun updatePinListState(lastTimeMap: MutableMap<String, Long>, pinList: MutableList<Pin>) {
         val tempPins = pinList.toMutableList()
         for (pin in tempPins) {
-            val pinTime = PIN_DATE_FORMAT.parse(pin.date).time
-            pin.isValid = (pinTime == lastTimeMap[pin.value])
+            if (pin.date.isNotEmpty()) {
+                val pinTime = PIN_DATE_FORMAT.parse(pin.date).time
+                pin.isValid = (pinTime == lastTimeMap[pin.value])
+            } else {
+                pin.isValid = true
+            }
         }
         isDataEmpty.set(tempPins.isEmpty())
         pins.value = tempPins

@@ -1,21 +1,20 @@
 package com.udnshopping.udnsauthorizer.viewmodel
 
-import androidx.annotation.UiThread
-import androidx.annotation.WorkerThread
-import androidx.lifecycle.LiveData
+import android.app.Activity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.udnshopping.udnsauthorizer.repository.QRCodeRepository
+import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.UdnSSLContextFactory
 import com.udnshopping.udnsauthorizer.utility.singleArgViewModelFactory
 import kotlinx.coroutines.*
-import java.io.BufferedInputStream
-import java.io.ByteArrayOutputStream
+import java.io.*
 import java.lang.Exception
 import java.net.URL
-import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.*
 
-class SendCodeViewModel(private val repository: QRCodeRepository) : ViewModel() {
+
+class SendCodeViewModel(var activity: Activity?) : ViewModel() {
 
     /**
      * This is the job for all coroutines started by this ViewModel.
@@ -30,9 +29,9 @@ class SendCodeViewModel(private val repository: QRCodeRepository) : ViewModel() 
      * Since we pass viewModelJob, you can cancel all coroutines launched by uiScope by calling
      * viewModelJob.cancel()
      */
-    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+    private val scope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
-    var result = MutableLiveData<String>().apply { postValue("") }
+    var result = MutableLiveData<String>()
 
     override fun onCleared() {
         super.onCleared()
@@ -40,18 +39,25 @@ class SendCodeViewModel(private val repository: QRCodeRepository) : ViewModel() 
     }
 
     fun sendEmail(email: String) {
-        uiScope.launch {
-            result.value = sendEmailToTOTP(email)
+         scope.launch(Dispatchers.IO) {
+            result.postValue(sendEmailToTOTP(email))
         }
     }
 
-    suspend fun sendEmailToTOTP(email: String) : String? {
-        val url = URL("${TOTP_API}$email")
-        val urlConnection = url.openConnection() as HttpsURLConnection
+    private fun sendEmailToTOTP(email: String) : String? {
         var result: String? = null
+        val url = URL("$TOTP_API$email")
+        val urlConnection = url.openConnection() as HttpsURLConnection
 
         try {
-            val inputStream = BufferedInputStream(urlConnection.getInputStream())
+            // Sets the SSLSocketFactory
+//            activity?.resources?.openRawResource(R.raw.udn)?.let { input ->
+//                UdnSSLContextFactory.getSSLContext(input)?.let {
+//                    urlConnection.sslSocketFactory = it.socketFactory
+//                }
+//            }
+
+            val inputStream = BufferedInputStream(urlConnection.inputStream)
             val buffer = ByteArrayOutputStream()
             var resultStream = inputStream.read()
             while (resultStream != -1) {
@@ -59,11 +65,11 @@ class SendCodeViewModel(private val repository: QRCodeRepository) : ViewModel() 
                 resultStream = inputStream.read()
             }
             result = buffer.toString("UTF-8")
-            Logger.d(TAG, "response: }")
+            Logger.d(TAG, "result: $result")
 
             inputStream.close()
         } catch (exception: Exception) {
-            Logger.d(TAG, "error message: ${exception.toString()}")
+            Logger.d(TAG, "error message: ${exception.message}")
             result = exception.localizedMessage.toString()
         } finally {
             urlConnection.disconnect()
@@ -80,8 +86,6 @@ class SendCodeViewModel(private val repository: QRCodeRepository) : ViewModel() 
 
         /**
          * Factory for creating [SendCodeViewModel]
-         *
-         * @param arg the repository to pass to [SendCodeViewModel]
          */
         val FACTORY = singleArgViewModelFactory(::SendCodeViewModel)
     }
