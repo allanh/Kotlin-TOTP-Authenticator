@@ -3,15 +3,15 @@ package com.udnshopping.udnsauthorizer.viewmodel
 import android.app.Activity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.utility.Logger
-import com.udnshopping.udnsauthorizer.utility.UdnSSLContextFactory
 import com.udnshopping.udnsauthorizer.utility.singleArgViewModelFactory
 import kotlinx.coroutines.*
 import java.io.*
 import java.lang.Exception
 import java.net.URL
 import javax.net.ssl.*
+
+
 
 
 class SendCodeViewModel(var activity: Activity?) : ViewModel() {
@@ -51,12 +51,13 @@ class SendCodeViewModel(var activity: Activity?) : ViewModel() {
 
         try {
             // Sets the SSLSocketFactory
-//            activity?.resources?.openRawResource(R.raw.udn)?.let { input ->
-//                UdnSSLContextFactory.getSSLContext(input)?.let {
-//                    urlConnection.sslSocketFactory = it.socketFactory
+//            val input = activity?.resources?.openRawResource(R.raw.udn)
+//            input?.let {
+//                Logger.d(TAG, "input: ${input.available()}")
+//                UdnSSLContextFactory.getSSLContext(it)?.let { context ->
+//                    urlConnection.sslSocketFactory = context.socketFactory
 //                }
 //            }
-
             val inputStream = BufferedInputStream(urlConnection.inputStream)
             val buffer = ByteArrayOutputStream()
             var resultStream = inputStream.read()
@@ -77,6 +78,12 @@ class SendCodeViewModel(var activity: Activity?) : ViewModel() {
             return result
         }
     }
+
+//    val hostnameVerifier = HostnameVerifier { _, session ->
+//        HttpsURLConnection.getDefaultHostnameVerifier().run {
+//            verify("udn.com", session)
+//        }
+//    }
 
     companion object {
 
