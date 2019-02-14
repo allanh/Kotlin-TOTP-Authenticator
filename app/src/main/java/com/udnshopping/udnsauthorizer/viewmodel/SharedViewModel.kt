@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
-import androidx.core.content.ContextCompat
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +16,7 @@ import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.model.Secret
 import com.udnshopping.udnsauthorizer.extension.SingleLiveEvent
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.utility.ThreeDESUtil
 import org.apache.commons.codec.binary.Base32
 import java.text.SimpleDateFormat
@@ -33,7 +32,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
 
     init {
         secrets = getSecretList()
-        Logger.d(TAG, "secrets size: ${secrets.size}")
+        ULog.d(TAG, "secrets size: ${secrets.size}")
         isDataEmpty.set(secrets.isEmpty())
         updatePins()
     }
@@ -47,9 +46,9 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
             activity?.getString(R.string.preference_file_key),
             Context.MODE_PRIVATE
         )
-        Logger.d(TAG, "preferences: ${preferences.toString()}")
+        ULog.d(TAG, "preferences: ${preferences.toString()}")
         val json = preferences?.getString(kSecretList, "") ?: ""
-        Logger.d(TAG, "json: $json")
+        ULog.d(TAG, "json: $json")
         return if (json.isNotBlank()) Gson().fromJson(json, type) else mutableListOf()
     }
 
@@ -59,16 +58,16 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
      * Removes an element at the specified [position] from the secret and pin list.
      */
     @Synchronized fun removeAt(position: Int) {
-        Logger.d(TAG, "removeAt: $position")
+        ULog.d(TAG, "removeAt: $position")
         if (position >= 0 && position < secrets.size) {
             secrets.removeAt(position)
-            Logger.d(TAG, "removed secret list size: ${secrets.size}")
+            ULog.d(TAG, "removed secret list size: ${secrets.size}")
 
             var tempPins = pins.value?.toMutableList()
             tempPins?.removeAt(position)
             isDataEmpty.set(tempPins?.isEmpty() ?: true)
             pins.value = tempPins
-            Logger.d(TAG, "removed pin list size: ${pins.value?.size}")
+            ULog.d(TAG, "removed pin list size: ${pins.value?.size}")
         }
     }
 
@@ -80,7 +79,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
         var secret: Secret? = null
         val auth_length = auth?.length ?: 0
 
-        Logger.d(TAG, "add Data: $auth")
+        ULog.d(TAG, "add Data: $auth")
         if (auth_length > 0 && (auth?.startsWith("otpauth://totp")) == false) {
             val decryptString = auth.substring(2)
             try {
@@ -89,7 +88,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
                     val type = object : TypeToken<Map<String, String>>() {}.type
                     val json = decrypt
                     val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
-                    Logger.d(TAG, "secretInfo: ${secretInfo?.toString()}")
+                    ULog.d(TAG, "secretInfo: ${secretInfo?.toString()}")
 
                     // Change the data format
                     if (!(secretInfo == null || secretInfo.isEmpty())) {
@@ -116,7 +115,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
             showQRCodeErrorEvent.call()
         }
         if (secret != null) {
-            Logger.d(TAG, "add secret: ${secret.key}")
+            ULog.d(TAG, "add secret: ${secret.key}")
             secrets.add(secret)
 
             //--SAVE Data
@@ -184,7 +183,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
      * Save the secrets to shared preferences.
      */
     fun saveData() {
-        Logger.d(TAG, "save data: ${secrets.size}")
+        ULog.d(TAG, "save data: ${secrets.size}")
         //--SAVE Data
         val preferences = activity?.getSharedPreferences(
             activity?.getString(R.string.preference_file_key),

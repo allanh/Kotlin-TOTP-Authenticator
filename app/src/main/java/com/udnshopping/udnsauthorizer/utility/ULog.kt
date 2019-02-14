@@ -8,7 +8,8 @@ import com.udnshopping.udnsauthorizer.BuildConfig
  * And then leverage the BuildConfig.DEBUG build type variable that you could use to determine if
  * you code is running in DEBUG or RELEASE build.
  */
-object Logger {
+object ULog {
+
     fun e(tag: String, message: String?) {
         if (BuildConfig.DEBUG)
             Log.e(tag, message)

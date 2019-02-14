@@ -24,7 +24,7 @@ import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
 import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
 import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 import org.greenrobot.eventbus.EventBus
@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Logger.d(TAG, "onCreate")
+        ULog.d(TAG, "onCreate")
 
         var binding = DataBindingUtil.setContentView<ActivityMainBinding>(this,
             R.layout.activity_main
@@ -76,10 +76,10 @@ class MainActivity : AppCompatActivity() {
         FirebaseAnalytics.getInstance(this)
 
         mViewModel.showQRCodeErrorEvent.observe(this, Observer {
-            Logger.d(TAG, "show qr code error")
+            ULog.d(TAG, "show qr code error")
             errorQRCodeAlert()
         })
-        Logger.d(TAG, "onCreate done")
+        ULog.d(TAG, "onCreate done")
     }
 
     override fun onBackPressed() {

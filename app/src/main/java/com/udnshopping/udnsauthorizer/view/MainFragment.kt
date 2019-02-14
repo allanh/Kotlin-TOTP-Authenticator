@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 
@@ -27,7 +27,7 @@ class MainFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Logger.d(TAG, "onCreate")
+        ULog.d(TAG, "onCreate")
 
         var binding =
             DataBindingUtil.inflate<FragmentMainBinding>(inflater,
@@ -51,7 +51,7 @@ class MainFragment : Fragment() {
             ViewModelProviders.of(this, SharedViewModelFactory(this)).get(SharedViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
-        Logger.d(TAG, "onCreate done")
+        ULog.d(TAG, "onCreate done")
 
         return binding.root
     }

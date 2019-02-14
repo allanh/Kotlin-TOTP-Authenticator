@@ -5,7 +5,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.ViewModel
 import com.udnshopping.udnsauthorizer.utility.singleArgViewModelFactory
@@ -54,14 +54,14 @@ class MainViewModel(var activity: Activity?) : ViewModel() {
         remoteConfig.fetch(cacheExpiration)
             .addOnCompleteListener(activity!!) { task ->
                 if (task.isSuccessful) {
-                    Logger.d(TAG, "Fetch successful")
+                    ULog.d(TAG, "Fetch successful")
                     // After config data is successfully fetched, it must be activated before newly fetched
                     // values are returned.
                     remoteConfig.activateFetched()
-                    Logger.d(TAG, "isEmailInput: ${remoteConfig.getBoolean(EMAIL_INPUT_CONFIG_KEY)}")
+                    ULog.d(TAG, "isEmailInput: ${remoteConfig.getBoolean(EMAIL_INPUT_CONFIG_KEY)}")
                     isEmailInput.set(remoteConfig.getBoolean(EMAIL_INPUT_CONFIG_KEY))
                 } else {
-                    Logger.e(TAG, "Fetch Failed")
+                    ULog.e(TAG, "Fetch Failed")
                 }
             }
     }

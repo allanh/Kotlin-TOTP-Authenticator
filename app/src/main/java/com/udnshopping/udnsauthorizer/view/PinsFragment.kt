@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.lifecycle.Observer
 import com.udnshopping.udnsauthorizer.model.Pin
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 import androidx.databinding.DataBindingUtil
@@ -45,7 +45,7 @@ class PinsFragment : Fragment(), IOnBackPressed {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        Logger.d(TAG, "onCreate")
+        ULog.d(TAG, "onCreate")
 
         binding =
             DataBindingUtil.inflate<FragmentPinsBinding>(inflater,
@@ -55,7 +55,7 @@ class PinsFragment : Fragment(), IOnBackPressed {
             ViewModelProviders.of(this, SharedViewModelFactory(this)).get(SharedViewModel::class.java)
         } ?: throw Exception("Invalid Activity")
 
-        Logger.d(TAG, "pin size: ${viewModel.getPinList()?.size}")
+        ULog.d(TAG, "pin size: ${viewModel.getPinList()?.size}")
         viewModel.pins.observe(this, Observer {
 
             (binding.pinsRecyclerView.adapter as SecretAdapter).updateData(it)
@@ -67,10 +67,10 @@ class PinsFragment : Fragment(), IOnBackPressed {
         })
         binding.viewModel = viewModel
 
-        //Logger.d(TAG, "setListView: ${it.size}")
+        //ULog.d(TAG, "setListView: ${it.size}")
         setListView(viewModel.getPinList())
 
-        Logger.d(TAG, "onCreate done")
+        ULog.d(TAG, "onCreate done")
 
         return binding.root
     }
@@ -115,7 +115,7 @@ class PinsFragment : Fragment(), IOnBackPressed {
 
         val swipeHandler = object : SwipeToDeleteCallback(fragmentContext) {
             override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
-                Logger.d(TAG, "swiped")
+                ULog.d(TAG, "swiped")
                 viewModel.removeAt(viewHolder.adapterPosition)
             }
         }

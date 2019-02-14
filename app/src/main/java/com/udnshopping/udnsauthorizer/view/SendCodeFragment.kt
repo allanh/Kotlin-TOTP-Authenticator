@@ -13,10 +13,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.FragmentSendCodeBinding
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.viewmodel.SendCodeViewModel
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
-import com.udnshopping.udnsauthorizer.repository.QRCodeRepository
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 
@@ -31,14 +30,14 @@ class SendCodeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Logger.d(TAG, "onCreate")
+        ULog.d(TAG, "onCreate")
 
         mBinding =
             DataBindingUtil.inflate<FragmentSendCodeBinding>(inflater,
                 R.layout.fragment_send_code, container, false)
         mViewModel = SendCodeViewModel(activity)
         mViewModel.result.observe(this, Observer {
-            Logger.d(TAG, "$it")
+            ULog.d(TAG, "result: $it")
             activity?.onBackPressed()
         })
 
@@ -46,7 +45,7 @@ class SendCodeFragment : Fragment() {
 
         EventBus.getDefault().register(this)
 
-        Logger.d(TAG, "onCreate done")
+        ULog.d(TAG, "onCreate done")
         return mBinding.root
     }
 

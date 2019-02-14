@@ -3,7 +3,7 @@ package com.udnshopping.udnsauthorizer.viewmodel
 import android.app.Activity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.utility.singleArgViewModelFactory
 import kotlinx.coroutines.*
 import java.io.*
@@ -53,7 +53,7 @@ class SendCodeViewModel(var activity: Activity?) : ViewModel() {
             // Sets the SSLSocketFactory
 //            val input = activity?.resources?.openRawResource(R.raw.udn)
 //            input?.let {
-//                Logger.d(TAG, "input: ${input.available()}")
+//                ULog.d(TAG, "input: ${input.available()}")
 //                UdnSSLContextFactory.getSSLContext(it)?.let { context ->
 //                    urlConnection.sslSocketFactory = context.socketFactory
 //                }
@@ -66,15 +66,15 @@ class SendCodeViewModel(var activity: Activity?) : ViewModel() {
                 resultStream = inputStream.read()
             }
             result = buffer.toString("UTF-8")
-            Logger.d(TAG, "result: $result")
+            ULog.d(TAG, "result: $result")
 
             inputStream.close()
         } catch (exception: Exception) {
-            Logger.d(TAG, "error message: ${exception.message}")
+            ULog.d(TAG, "error message: ${exception.message}")
             result = exception.localizedMessage.toString()
         } finally {
             urlConnection.disconnect()
-            Logger.d(TAG, "finally")
+            ULog.d(TAG, "finally")
             return result
         }
     }

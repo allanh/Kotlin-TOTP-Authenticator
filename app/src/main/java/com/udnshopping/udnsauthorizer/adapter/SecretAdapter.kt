@@ -49,7 +49,7 @@ class SecretAdapter(private var items: List<Pin>?, private val context: Context)
 
             // Progress
             val progress = (60 - (it[position].progress % 60)) * 100 / 60
-            //Logger.d("adapter", "progress: $progress")
+            //ULog.d("adapter", "progress: $progress")
             viewHolder.progressBar.progress = progress
 
             // Set color

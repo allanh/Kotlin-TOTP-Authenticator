@@ -14,7 +14,7 @@ import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.adapter.ConfigAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentConfigBinding
-import com.udnshopping.udnsauthorizer.utility.Logger
+import com.udnshopping.udnsauthorizer.utility.ULog
 
 
 class ConfigFragment  : Fragment() {
@@ -41,7 +41,7 @@ class ConfigFragment  : Fragment() {
                 ConfigAdapter(configs.config, activity as Context)
 
         binding.configToolbar.setNavigationOnClickListener {
-            Logger.d(TAG, "Navigation click")
+            ULog.d(TAG, "Navigation click")
             activity?.supportFragmentManager?.popBackStack()
         }
 
@@ -52,7 +52,7 @@ class ConfigFragment  : Fragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        Logger.d(TAG, "onCreateOptionMenu")
+        ULog.d(TAG, "onCreateOptionMenu")
         menu.clear()
         inflater.inflate(R.menu.toolbar_config, menu)
     }

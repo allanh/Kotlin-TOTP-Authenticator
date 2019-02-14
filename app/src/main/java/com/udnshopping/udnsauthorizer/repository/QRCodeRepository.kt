@@ -1,11 +1,7 @@
 package com.udnshopping.udnsauthorizer.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import com.udnshopping.udnsauthorizer.utility.Logger
-import com.udnshopping.udnsauthorizer.viewmodel.SendCodeViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.udnshopping.udnsauthorizer.utility.ULog
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
@@ -57,7 +53,7 @@ class QRCodeRepository() {
                 buffer.write(resultStream.toByte().toInt())
                 resultStream = inputStream.read()
             }
-            Logger.d(TAG, "response: ${buffer.toString("UTF-8")}")
+            ULog.d(TAG, "response: ${buffer.toString("UTF-8")}")
 
             inputStream.close()
         } catch (exception: Exception) {

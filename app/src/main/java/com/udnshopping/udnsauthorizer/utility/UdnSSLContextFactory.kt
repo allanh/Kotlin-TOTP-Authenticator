@@ -29,11 +29,11 @@ object UdnSSLContextFactory {
             val trustManagers = createTrustManager(keyStore)
             return createSSLContext(trustManagers)
         } catch (e: CertificateException) {
-            Logger.e(TAG, "Failed to create certificate factory, ${e.message}")
+            ULog.e(TAG, "Failed to create certificate factory, ${e.message}")
         } catch (e: KeyStoreException) {
-            Logger.e(TAG, "Failed to get key store instance, ${e.message}")
+            ULog.e(TAG, "Failed to get key store instance, ${e.message}")
         } catch (e: KeyManagementException) {
-            Logger.e(TAG, "Failed to initialize SSL Context, ${e.message}")
+            ULog.e(TAG, "Failed to initialize SSL Context, ${e.message}")
         }
         return null
     }
@@ -62,11 +62,11 @@ object UdnSSLContextFactory {
                 setCertificateEntry("ca", certificate)
             }
         } catch (e: IOException) {
-            Logger.e(TAG, "Could not load key store, ${e.message}")
+            ULog.e(TAG, "Could not load key store, ${e.message}")
         } catch (e: NoSuchAlgorithmException) {
-            Logger.e(TAG, "Could not load key store, ${e.message}")
+            ULog.e(TAG, "Could not load key store, ${e.message}")
         } catch (e: CertificateException) {
-            Logger.e(TAG, "Could not load key store, ${e.message}")
+            ULog.e(TAG, "Could not load key store, ${e.message}")
         }
         return null
     }
@@ -83,7 +83,7 @@ object UdnSSLContextFactory {
             }
             return tmf.trustManagers
         } catch (e: NoSuchAlgorithmException) {
-            Logger.e(TAG, "Failed to get trust manager factory with default algorithm, ${e.message}")
+            ULog.e(TAG, "Failed to get trust manager factory with default algorithm, ${e.message}")
         }
         return null
     }
@@ -98,7 +98,7 @@ object UdnSSLContextFactory {
                 init(null, trustManagers, null)
             }
         } catch (e: NoSuchAlgorithmException) {
-            Logger.e(TAG, "Failed to initialize SSL context with TLS algorithm, ${e.message}")
+            ULog.e(TAG, "Failed to initialize SSL context with TLS algorithm, ${e.message}")
         }
         return null
     }
