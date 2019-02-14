@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "676422791944",
+    "firebase_url": "https://udn-spm-otp.firebaseio.com",
+    "project_id": "udn-spm-otp",
+    "storage_bucket": "udn-spm-otp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676422791944:android:9bbf962f2e254388",
+        "android_client_info": {
+          "package_name": "com.udnshopping.udnsauthorizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "676422791944-7qqeu6tui3qsqpp8nurn3vimpmf8nf2h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWfgQ67pXWjV5lmmWNYnsfZNV-l5YKpB0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
