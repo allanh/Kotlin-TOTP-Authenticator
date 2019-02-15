@@ -137,7 +137,7 @@ class SharedViewModel(var activity: Activity?) : ViewModel() {
         )
         for (secret in secrets) {
             if (secret.key.isNotEmpty() && secret.value.isNotEmpty()) {
-                val key = Base32().decode(secret.key)
+                val key = secret.key.toByteArray()
                 val timeBasedOneTimePasswordGenerator =
                     TimeBasedOneTimePasswordGenerator(key, config)
                 val pinString = timeBasedOneTimePasswordGenerator.generate()

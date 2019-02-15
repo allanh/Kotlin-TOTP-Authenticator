@@ -24,7 +24,7 @@ class SendCodeViewModel(var activity: Activity?) : ViewModel() {
     private val viewModelJob = Job()
 
     /**
-     * This is the main scope for all coroutines launched by MainViewModel.
+     * This is the main scope for all coroutines launched by SendCodeViewModel.
      *
      * Since we pass viewModelJob, you can cancel all coroutines launched by uiScope by calling
      * viewModelJob.cancel()

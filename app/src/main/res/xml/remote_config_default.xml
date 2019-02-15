@@ -2,6 +2,14 @@
 <defaultsMap>
     <entry>
         <key>email_input_enabled</key>
-        <value>true</value>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>Android_force_update_version</key>
+        <value>0</value>
+    </entry>
+    <entry>
+        <key>force_update</key>
+        <value>false</value>
     </entry>
 </defaultsMap>

@@ -13,29 +13,39 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
 import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
 import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
+import com.udnshopping.udnsauthorizer.viewmodel.MainActivityViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
+import dagger.android.AndroidInjection
+import dagger.android.AndroidInjector
+import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.HasSupportFragmentInjector
 import org.greenrobot.eventbus.EventBus
+import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
-    private lateinit var appBarConfiguration : AppBarConfiguration
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var mainViewModel: MainActivityViewModel
     private lateinit var mViewModel: SharedViewModel
+    @Inject
+    lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         ULog.d(TAG, "onCreate")
 
@@ -49,37 +59,29 @@ class MainActivity : AppCompatActivity() {
         actionBar?.setHomeButtonEnabled(true)
         actionBar?.setDisplayHomeAsUpEnabled(true)
 
+        mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
+//        mainViewModel.isForceUpdateObservable().observe(this, Observer {
+//            //            if (it) {
+//            ULog.d(TAG, "new isForceUpdate: $it")
+//            if (mainViewModel.checkApkVersion(getVersion())) {
+//                showUpdateDialog()
+//            }
+////            }
+//        })
+        mainViewModel.fetchRemoteConfig()
+
         mViewModel = ViewModelProviders.of(this,
             SharedViewModelFactory(this)).get(SharedViewModel::class.java)
-        binding.viewModel = mViewModel
-
-        val host: NavHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment? ?: return
-
-        // Set up Action Bar
-        val navController = host.navController
-        //appBarConfiguration = AppBarConfiguration(navController.graph)
-        //setupActionBarWithNavController(navController)
-/*
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            val dest: String = try {
-                resources.getResourceName(destination.id)
-            } catch (e: Resources.NotFoundException) {
-                Integer.toString(destination.id)
-            }
-            Toast.makeText(this@MainActivity, "Navigated to $dest",
-                Toast.LENGTH_SHORT).show()
-            Log.d("NavigationActivity", "Navigated to $dest")
-        }
-*/
-        // Initialize FireBase.
-        FirebaseAnalytics.getInstance(this)
-
         mViewModel.showQRCodeErrorEvent.observe(this, Observer {
             ULog.d(TAG, "show qr code error")
             errorQRCodeAlert()
         })
+        binding.viewModel = mViewModel
         ULog.d(TAG, "onCreate done")
+    }
+
+    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
+        return fragmentInjector
     }
 
     override fun onBackPressed() {
@@ -192,6 +194,16 @@ class MainActivity : AppCompatActivity() {
         builder.show()
     }
 
+    private fun showUpdateDialog() {
+        val builder = AlertDialog.Builder(this)
+            .setTitle(R.string.update_dialog_title)
+            .setMessage(getString(R.string.update_dialog_content))
+            .setNegativeButton(R.string.update) { dialog, _ ->
+                dialog.dismiss()
+            }
+        builder.show()
+    }
+
     fun scan() {
         val intent = Intent(this, ScanActivity::class.java)
         startActivityForResult(intent, SCAN_QR_CODE)
@@ -229,10 +241,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getVersion(): String {
+        try {
+            val pInfo = getPackageManager()?.getPackageInfo(packageName, 0)
+            return pInfo?.versionName ?: "1.0.0"
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+        return "1.0.0"
+    }
+
     private fun goSetting() {
         val intent = Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
             Uri.fromParts("package", packageName, null)
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+    }
+
+    private fun redirectStore() {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(getString(R.string.update_url))
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)

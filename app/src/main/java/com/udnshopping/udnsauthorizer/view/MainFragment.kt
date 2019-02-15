@@ -1,5 +1,6 @@
 package com.udnshopping.udnsauthorizer.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,20 +8,30 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.udnshopping.udnsauthorizer.databinding.FragmentMainBinding
-import com.udnshopping.udnsauthorizer.viewmodel.MainViewModel
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.utility.ULog
+import com.udnshopping.udnsauthorizer.viewmodel.MainActivityViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
 import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 
 class MainFragment : Fragment() {
 
-    private lateinit var mViewModel: MainViewModel
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var mainViewModel: MainActivityViewModel
     private lateinit var sharedViewModel: SharedViewModel
+
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,12 +40,11 @@ class MainFragment : Fragment() {
     ): View? {
         ULog.d(TAG, "onCreate")
 
-        var binding =
+        val binding =
             DataBindingUtil.inflate<FragmentMainBinding>(inflater,
                 R.layout.fragment_main, container, false)
-        mViewModel = MainViewModel(activity)
-        binding.viewModel = mViewModel
-
+        mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
+        binding.viewModel = mainViewModel
         binding.buttonScan.setOnClickListener {
             if (sharedViewModel.isDataEmpty.get()) {
                 (activity as MainActivity).checkPermission()
@@ -52,7 +62,6 @@ class MainFragment : Fragment() {
         } ?: throw Exception("Invalid Activity")
 
         ULog.d(TAG, "onCreate done")
-
         return binding.root
     }
 
@@ -65,13 +74,7 @@ class MainFragment : Fragment() {
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-    }
-
     companion object {
-
         private const val TAG = "MainFragment"
-
     }
 }

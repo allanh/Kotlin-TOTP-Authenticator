@@ -19,8 +19,6 @@ import com.udnshopping.udnsauthorizer.utility.ULog
 
 class ConfigFragment  : Fragment() {
 
-    lateinit var configs: Config
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
