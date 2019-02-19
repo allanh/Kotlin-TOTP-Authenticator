@@ -17,7 +17,7 @@ constructor(private val remoteConfig: FirebaseRemoteConfig) {
     private var udnRemoteConfig: MutableLiveData<UdnRemoteConfig> = MutableLiveData()
 
     init {
-        ULog.d(TAG, "Injection DiscoverRepository")
+        ULog.d(TAG, "Injection RemoteConfigRepository")
         initRemoteConfig()
     }
 
@@ -79,6 +79,5 @@ constructor(private val remoteConfig: FirebaseRemoteConfig) {
         private const val FORCE_UPDATE_KEY = "force_update"
 
         private const val FORCE_UPDATE_VERSION_KEY = "Android_force_update_version"
-
     }
 }

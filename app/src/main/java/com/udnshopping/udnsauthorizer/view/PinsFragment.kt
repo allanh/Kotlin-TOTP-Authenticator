@@ -11,19 +11,22 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.lifecycle.Observer
 import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
-import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
+import com.udnshopping.udnsauthorizer.viewmodel.PinsViewModel
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProvider
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback
 import com.udnshopping.udnsauthorizer.adapter.SecretAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentPinsBinding
 import com.udnshopping.udnsauthorizer.callback.IOnBackPressed
-
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
 class PinsFragment : Fragment(), IOnBackPressed {
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var viewModel: SharedViewModel
+    private lateinit var viewModel: PinsViewModel
     private lateinit var binding: FragmentPinsBinding
     private var handler = Handler()
     private var isPosted = false
@@ -31,9 +34,7 @@ class PinsFragment : Fragment(), IOnBackPressed {
         set(value) {
             synchronized(value) {
                 if (value) {
-                    handler.postDelayed(updateThread,
-                        UPDATE_TIME
-                    )
+                    handler.postDelayed(updateThread, UPDATE_TIME)
                     isPosted = true
                 } else if (isPosted) {
                     handler.removeCallbacks(updateThread)
@@ -42,21 +43,19 @@ class PinsFragment : Fragment(), IOnBackPressed {
             }
         }
 
+    override fun onAttach(context: Context?) {
+        AndroidSupportInjection.inject(this)
+        super.onAttach(context)
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(PinsViewModel::class.java)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         ULog.d(TAG, "onCreate")
-
-        binding =
-            DataBindingUtil.inflate<FragmentPinsBinding>(inflater,
-                R.layout.fragment_pins, container, false)
-
-        viewModel = activity?.run {
-            ViewModelProviders.of(this, SharedViewModelFactory(this)).get(SharedViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
-
-        ULog.d(TAG, "pin size: ${viewModel.getPinList()?.size}")
-        viewModel.pins.observe(this, Observer {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_pins, container, false)
+        ULog.d(TAG, "pin size: ${viewModel.getPinsObservable().value?.size}")
+        viewModel.getPinsObservable().observe(this, Observer {
 
             (binding.pinsRecyclerView.adapter as SecretAdapter).updateData(it)
             if (it.size == 0) {
@@ -66,9 +65,10 @@ class PinsFragment : Fragment(), IOnBackPressed {
             }
         })
         binding.viewModel = viewModel
+        binding.setLifecycleOwner(this)
 
         //ULog.d(TAG, "setListView: ${it.size}")
-        setListView(viewModel.getPinList())
+        setListView(viewModel.getPinsObservable().value)
 
         ULog.d(TAG, "onCreate done")
 
@@ -97,10 +97,7 @@ class PinsFragment : Fragment(), IOnBackPressed {
     override fun onBackPressed() = false
 
     private fun setListView(pins: MutableList<Pin>?) {
-        var fragmentContext = context as Context
-        if (fragmentContext == null) {
-            return
-        }
+        val fragmentContext = context as Context
 
         // Creates a vertical Layout Manager
         binding.pinsRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)

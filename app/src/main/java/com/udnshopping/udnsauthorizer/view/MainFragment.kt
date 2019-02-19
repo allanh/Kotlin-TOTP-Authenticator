@@ -9,28 +9,33 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.udnshopping.udnsauthorizer.databinding.FragmentMainBinding
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.viewmodel.MainActivityViewModel
-import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
-import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
+import com.udnshopping.udnsauthorizer.viewmodel.PinsViewModel
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 
 class MainFragment : Fragment() {
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var mainViewModel: MainActivityViewModel
-    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onAttach(context: Context?) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+        mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
+        mainViewModel.isDataEmptyObservable().observe(this, Observer {
+            it?.let { isDataEmpty ->
+                ULog.d(TAG, "isDataEmpty")
+                if (!isDataEmpty) findNavController().navigate(R.id.pinsFragment)
+            }
+        })
     }
 
     override fun onCreateView(
@@ -39,27 +44,11 @@ class MainFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         ULog.d(TAG, "onCreate")
-
         val binding =
-            DataBindingUtil.inflate<FragmentMainBinding>(inflater,
-                R.layout.fragment_main, container, false)
-        mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
+            DataBindingUtil.inflate<FragmentMainBinding>(inflater, R.layout.fragment_main, container, false)
+        binding.fragment = this
         binding.viewModel = mainViewModel
-        binding.buttonScan.setOnClickListener {
-            if (sharedViewModel.isDataEmpty.get()) {
-                (activity as MainActivity).checkPermission()
-            } else {
-                findNavController().navigate(R.id.pinsFragment)
-            }
-        }
-
-        binding.buttonEmail.setOnClickListener {
-            findNavController().navigate(R.id.sendCodeFragment)
-        }
-
-        sharedViewModel = activity?.run {
-            ViewModelProviders.of(this, SharedViewModelFactory(this)).get(SharedViewModel::class.java)
-        } ?: throw Exception("Invalid Activity")
+        binding.setLifecycleOwner(this)
 
         ULog.d(TAG, "onCreate done")
         return binding.root
@@ -68,10 +57,14 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         (activity as AppCompatActivity).supportActionBar?.hide()
+    }
 
-        if (!sharedViewModel.isDataEmpty.get()) {
-            findNavController().navigate(R.id.pinsFragment)
-        }
+    fun onScanClick() {
+        (activity as MainActivity).checkPermission()
+    }
+
+    fun onEmailClick() {
+        findNavController().navigate(R.id.sendCodeFragment)
     }
 
     companion object {

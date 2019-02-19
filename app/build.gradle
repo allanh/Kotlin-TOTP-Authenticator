@@ -10,7 +10,7 @@ android {
         applicationId "com.udnshopping.udnsauthorizer"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 22
+        versionCode 26
         versionName "1.0.8"
         vectorDrawables.useSupportLibrary true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -88,6 +88,7 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:1.0.0-alpha09"
     implementation "android.arch.work:work-runtime-ktx:1.0.0-beta01"
     implementation "androidx.core:core-ktx:1.0.1"
+    implementation 'com.facebook.shimmer:shimmer:0.4.0'
 
     implementation 'androidx.exifinterface:exifinterface:1.0.0-beta01'
     testImplementation 'junit:junit:4.12'

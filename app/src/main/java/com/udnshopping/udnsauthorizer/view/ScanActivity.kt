@@ -31,7 +31,7 @@ class ScanActivity : AppCompatActivity() {
     }
 
     fun startCamera() {
-        setContentView(R.layout.activity_scan)
+        setContentView(R.layout.fragment_scan)
         box = Box(this)
         addContentView(
             box,

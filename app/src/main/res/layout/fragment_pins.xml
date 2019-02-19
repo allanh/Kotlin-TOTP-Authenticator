@@ -8,7 +8,7 @@
 
         <variable
                 name="viewModel"
-                type="com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel" />
+                type="com.udnshopping.udnsauthorizer.viewmodel.PinsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/tv_pins_hint"
                 android:textSize="16dp" android:layout_marginTop="120dp"
-                android:visibility="@{viewModel.isDataEmpty ? View.VISIBLE : View.GONE}"
+                android:visibility="@{viewModel.isDataEmptyObservable() ? View.VISIBLE : View.GONE}"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -38,7 +38,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="@android:color/darker_gray"
                 android:layout_marginTop="60dp"
-                android:visibility="@{!viewModel.isDataEmpty ? View.VISIBLE : View.GONE}"
+                android:visibility="@{!viewModel.isDataEmptyObservable() ? View.VISIBLE : View.GONE}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

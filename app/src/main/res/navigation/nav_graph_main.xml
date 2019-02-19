@@ -33,4 +33,8 @@
               android:label="fragment_config" tools:layout="@layout/fragment_config"/>
     <fragment android:id="@+id/sendCodeFragment" android:name="com.udnshopping.udnsauthorizer.view.SendCodeFragment"
               android:label="SendCodeFragment"/>
+    <fragment android:id="@+id/loadingFragment" android:name="com.udnshopping.udnsauthorizer.view.LoadingFragment"
+              android:label="LoadingFragment">
+        <action android:id="@+id/action_loadingFragment_to_mainFragment" app:destination="@id/mainFragment"/>
+    </fragment>
 </navigation>

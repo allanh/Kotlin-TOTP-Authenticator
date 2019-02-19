@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
 import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
@@ -25,13 +26,12 @@ import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.viewmodel.MainActivityViewModel
-import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModel
-import com.udnshopping.udnsauthorizer.viewmodel.SharedViewModelFactory
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import org.greenrobot.eventbus.EventBus
+import org.jetbrains.anko.progressDialog
 import javax.inject.Inject
 
 
@@ -39,45 +39,45 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var mainViewModel: MainActivityViewModel
-    private lateinit var mViewModel: SharedViewModel
     @Inject
     lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
+    private lateinit var mainViewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         ULog.d(TAG, "onCreate")
-
-        var binding = DataBindingUtil.setContentView<ActivityMainBinding>(this,
+        val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this,
             R.layout.activity_main
         )
 
-        //setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        actionBar?.hide()
-        actionBar?.setHomeButtonEnabled(true)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        actionBar?.apply {
+            hide()
+            setHomeButtonEnabled(true)
+            setDisplayHomeAsUpEnabled(true)
+        }
 
         mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
-//        mainViewModel.isForceUpdateObservable().observe(this, Observer {
-//            //            if (it) {
-//            ULog.d(TAG, "new isForceUpdate: $it")
-//            if (mainViewModel.checkApkVersion(getVersion())) {
-//                showUpdateDialog()
-//            }
-////            }
-//        })
-        mainViewModel.fetchRemoteConfig()
-
-        mViewModel = ViewModelProviders.of(this,
-            SharedViewModelFactory(this)).get(SharedViewModel::class.java)
-        mViewModel.showQRCodeErrorEvent.observe(this, Observer {
-            ULog.d(TAG, "show qr code error")
+        mainViewModel.isForceUpdateObservable.observe(this, Observer {
+            checkUpdate(it)
+        })
+        mainViewModel.getQRCodeErrorEventObservable().observe(this, Observer {
             errorQRCodeAlert()
         })
-        binding.viewModel = mViewModel
+        mainViewModel.fetchRemoteConfig()
+
+        binding.viewModel = mainViewModel
         ULog.d(TAG, "onCreate done")
+    }
+
+    private fun checkUpdate(isForceUpdate: Boolean) {
+        ULog.d(TAG, "new isForceUpdate: $isForceUpdate")
+        if (isForceUpdate) {
+            if (mainViewModel.checkApkVersion(getVersion())) {
+                showUpdateDialog()
+            }
+        }
     }
 
     override fun supportFragmentInjector(): AndroidInjector<Fragment> {
@@ -87,7 +87,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     override fun onBackPressed() {
         when (getCurrentFragmentId(R.id.nav_host_fragment)) {
             R.id.mainFragment, R.id.pinsFragment -> {
-                mViewModel.saveData()
+                mainViewModel.saveData()
                 finish()
             }
             else -> super.onBackPressed()
@@ -100,20 +100,25 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        return findNavController(R.id.nav_host_fragment).navigateUp();
+        return findNavController(R.id.nav_host_fragment).navigateUp()
     }
 
     override fun onResume() {
         super.onResume()
+
+        val isForceUpdate = mainViewModel.isForceUpdateObservable.value ?: false
+        checkUpdate(isForceUpdate)
+
+        val isDataEmpty = mainViewModel.isDataEmptyObservable().value ?: true
         if (!isCurrentFragment(R.id.nav_host_fragment, R.id.mainFragment)
-            && mViewModel.isDataEmpty.get()) {
+            && isDataEmpty) {
             findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
         }
     }
 
     override fun onStop() {
         super.onStop()
-        mViewModel.saveData()
+        mainViewModel.saveData()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -124,7 +129,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 if (data == null) {
                     return
                 }
-                mViewModel.addData(data.extras)
+                mainViewModel.addData(data.extras)
                 findNavController(R.id.nav_host_fragment).navigate(R.id.pinsFragment)
             }
             else -> { }
@@ -197,9 +202,10 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     private fun showUpdateDialog() {
         val builder = AlertDialog.Builder(this)
             .setTitle(R.string.update_dialog_title)
+            .setCancelable(false)
             .setMessage(getString(R.string.update_dialog_content))
-            .setNegativeButton(R.string.update) { dialog, _ ->
-                dialog.dismiss()
+            .setNegativeButton(R.string.update) { _, _ ->
+                redirectStore()
             }
         builder.show()
     }
@@ -243,7 +249,7 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
 
     private fun getVersion(): String {
         try {
-            val pInfo = getPackageManager()?.getPackageInfo(packageName, 0)
+            val pInfo = packageManager?.getPackageInfo(packageName, 0)
             return pInfo?.versionName ?: "1.0.0"
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
@@ -270,13 +276,11 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     }
 
     companion object {
-
         private const val TAG = "MainActivity"
 
         private const val CAMERA_REQUEST_CODE = 1
 
         private const val SCAN_QR_CODE = 2
-
     }
 }
 
