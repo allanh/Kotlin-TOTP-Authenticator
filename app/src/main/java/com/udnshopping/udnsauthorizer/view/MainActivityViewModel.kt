@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.viewmodel
+package com.udnshopping.udnsauthorizer.view
 
 import android.os.Bundle
 import androidx.lifecycle.LiveData

@@ -1,6 +1,5 @@
-package com.udnshopping.udnsauthorizer.viewmodel
+package com.udnshopping.udnsauthorizer.view.pins
 
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations

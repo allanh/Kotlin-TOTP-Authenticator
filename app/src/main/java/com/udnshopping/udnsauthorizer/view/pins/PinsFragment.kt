@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.view
+package com.udnshopping.udnsauthorizer.view.pins
 
 import android.content.Context
 import android.os.Bundle
@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.lifecycle.Observer
 import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.viewmodel.PinsViewModel
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.udnshopping.udnsauthorizer.R
@@ -19,13 +18,13 @@ import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback
 import com.udnshopping.udnsauthorizer.adapter.SecretAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentPinsBinding
 import com.udnshopping.udnsauthorizer.callback.IOnBackPressed
+import com.udnshopping.udnsauthorizer.view.MainActivity
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 class PinsFragment : Fragment(), IOnBackPressed {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-
     private lateinit var viewModel: PinsViewModel
     private lateinit var binding: FragmentPinsBinding
     private var handler = Handler()
@@ -34,7 +33,9 @@ class PinsFragment : Fragment(), IOnBackPressed {
         set(value) {
             synchronized(value) {
                 if (value) {
-                    handler.postDelayed(updateThread, UPDATE_TIME)
+                    handler.postDelayed(updateThread,
+                        UPDATE_TIME
+                    )
                     isPosted = true
                 } else if (isPosted) {
                     handler.removeCallbacks(updateThread)

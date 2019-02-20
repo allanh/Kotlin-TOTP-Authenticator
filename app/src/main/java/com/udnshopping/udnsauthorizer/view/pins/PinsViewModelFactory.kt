@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.viewmodel
+package com.udnshopping.udnsauthorizer.view.pins
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

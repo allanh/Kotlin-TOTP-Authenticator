@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.view
+package com.udnshopping.udnsauthorizer.view.config
 
 import android.content.Context
 import android.os.Bundle

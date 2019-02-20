@@ -6,8 +6,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/fragment_scan"
-        tools:context=".view.ScanActivity">
+        tools:showIn="@layout/activity_scan"
+        tools:context=".view.scan.ScanActivity">
 
     <SurfaceView
             android:layout_width="0dp"

@@ -15,8 +15,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.viewmodel.MainActivityViewModel
-import com.udnshopping.udnsauthorizer.viewmodel.PinsViewModel
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 

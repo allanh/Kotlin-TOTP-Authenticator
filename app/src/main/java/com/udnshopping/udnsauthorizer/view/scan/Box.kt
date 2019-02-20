@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.view
+package com.udnshopping.udnsauthorizer.view.scan
 
 import android.content.Context
 import android.graphics.Canvas
@@ -23,15 +23,16 @@ class Box internal constructor(context: Context) : View(context) {
     override fun onDraw(canvas: Canvas) { // Override the onDraw() Method
         super.onDraw(canvas)
 
-        paint.setStyle(Paint.Style.STROKE)
-        paint.setColor(ContextCompat.getColor(context, R.color.colorAccent))
-        paint.setStrokeWidth(5.0f)
+        // Draws the bounding box around the barcode.
+        paint.style = Paint.Style.STROKE
+        paint.color = ContextCompat.getColor(context, R.color.colorAccent)
+        paint.strokeWidth = 5.0f
 
         //center
-        val x0 = canvas.getWidth() / 2
-        val y0 = canvas.getHeight() / 2
-        val dx = canvas.getHeight() / 6
-        val dy = canvas.getHeight() / 6
+//        val x0 = canvas.width/ 2
+//        val y0 = canvas.height / 2
+//        val dx = canvas.height / 6
+//        val dy = canvas.height / 6
         //draw guide box
 //        canvas.drawRect((x0 - dx).toFloat(), (y0 - dy).toFloat(), (x0 + dx).toFloat(), (y0 + dy).toFloat(), paint)
         canvas.drawRect(rectangle, paint)

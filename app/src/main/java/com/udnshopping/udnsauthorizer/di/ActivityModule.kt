@@ -1,6 +1,7 @@
 package com.udnshopping.udnsauthorizer.di
 
 import com.udnshopping.udnsauthorizer.view.MainActivity
+import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".view.ScanActivity"
+                android:name=".view.scan.ScanActivity"
                 android:label="@string/title_activity_scan"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>

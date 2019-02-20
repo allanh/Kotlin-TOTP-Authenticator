@@ -8,7 +8,7 @@
 
         <variable
                 name="viewModel"
-                type="com.udnshopping.udnsauthorizer.viewmodel.PinsViewModel" />
+                type="com.udnshopping.udnsauthorizer.view.pins.PinsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

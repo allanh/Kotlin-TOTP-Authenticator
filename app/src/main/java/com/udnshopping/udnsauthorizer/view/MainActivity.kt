@@ -18,20 +18,18 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
 import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
 import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.viewmodel.MainActivityViewModel
+import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import org.greenrobot.eventbus.EventBus
-import org.jetbrains.anko.progressDialog
 import javax.inject.Inject
 
 
@@ -72,10 +70,11 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
     }
 
     private fun checkUpdate(isForceUpdate: Boolean) {
-        ULog.d(TAG, "new isForceUpdate: $isForceUpdate")
+        ULog.d(TAG, "check isForceUpdate: $isForceUpdate")
         if (isForceUpdate) {
             if (mainViewModel.checkApkVersion(getVersion())) {
-                showUpdateDialog()
+                ULog.d(TAG, "show update dialog")
+                //showUpdateDialog()
             }
         }
     }

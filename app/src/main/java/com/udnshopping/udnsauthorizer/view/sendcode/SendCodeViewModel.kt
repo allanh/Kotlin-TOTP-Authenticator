@@ -1,20 +1,20 @@
-package com.udnshopping.udnsauthorizer.viewmodel
+package com.udnshopping.udnsauthorizer.view.sendcode
 
-import android.app.Activity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.udnshopping.udnsauthorizer.repository.SecretRepository
 import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.utility.singleArgViewModelFactory
 import kotlinx.coroutines.*
 import java.io.*
 import java.lang.Exception
 import java.net.URL
+import javax.inject.Inject
 import javax.net.ssl.*
 
 
 
 
-class SendCodeViewModel(var activity: Activity?) : ViewModel() {
+class SendCodeViewModel : ViewModel() {
 
     /**
      * This is the job for all coroutines started by this ViewModel.
@@ -90,10 +90,5 @@ class SendCodeViewModel(var activity: Activity?) : ViewModel() {
         private const val TAG = "SendCodeViewModel"
 
         private const val TOTP_API = "https://uat-shopping56.udn.com/spm/TOTPGenQrcodeMail.do?source="
-
-        /**
-         * Factory for creating [SendCodeViewModel]
-         */
-        val FACTORY = singleArgViewModelFactory(::SendCodeViewModel)
     }
 }

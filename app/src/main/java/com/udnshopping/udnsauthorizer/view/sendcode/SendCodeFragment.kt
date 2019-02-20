@@ -1,4 +1,4 @@
-package com.udnshopping.udnsauthorizer.view
+package com.udnshopping.udnsauthorizer.view.sendcode
 
 import android.content.Context
 import android.os.Bundle
@@ -14,7 +14,6 @@ import androidx.lifecycle.Observer
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.FragmentSendCodeBinding
 import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.viewmodel.SendCodeViewModel
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -22,8 +21,17 @@ import org.greenrobot.eventbus.Subscribe
 
 class SendCodeFragment : Fragment() {
 
-    private lateinit var mViewModel: SendCodeViewModel
-    private lateinit var mBinding: FragmentSendCodeBinding
+    private lateinit var viewModel: SendCodeViewModel
+    private lateinit var binding: FragmentSendCodeBinding
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        viewModel = SendCodeViewModel()
+        viewModel.result.observe(this, Observer {
+            ULog.d(TAG, "result: $it")
+            activity?.onBackPressed()
+        })
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,29 +40,20 @@ class SendCodeFragment : Fragment() {
     ): View? {
         ULog.d(TAG, "onCreate")
 
-        mBinding =
+        binding =
             DataBindingUtil.inflate<FragmentSendCodeBinding>(inflater,
                 R.layout.fragment_send_code, container, false)
-        mViewModel = SendCodeViewModel(activity)
-        mViewModel.result.observe(this, Observer {
-            ULog.d(TAG, "result: $it")
-            activity?.onBackPressed()
-        })
-
-        mBinding.viewModel = mViewModel
-
+        binding.viewModel = viewModel
         EventBus.getDefault().register(this)
-
         ULog.d(TAG, "onCreate done")
-        return mBinding.root
+        return binding.root
     }
 
     override fun onResume() {
         super.onResume()
         (activity as AppCompatActivity).supportActionBar?.hide()
-
         context?.let {
-            openSoftKeyboard(it, mBinding.etEmail)
+            openSoftKeyboard(it, binding.etEmail)
         }
     }
 
@@ -65,9 +64,9 @@ class SendCodeFragment : Fragment() {
     fun onKeyEvent(event: KeyUpEvent) {
         when (event.keyCode) {
             KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
-                val email = mBinding.etEmail.text.toString()
+                val email = binding.etEmail.text.toString()
                 if (!email.isEmpty()) {
-                    mViewModel.sendEmail(email)
+                    viewModel.sendEmail(email)
                 }
             }
             else -> {}
