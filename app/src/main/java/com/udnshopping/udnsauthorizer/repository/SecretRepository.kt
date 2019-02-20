@@ -92,7 +92,7 @@ constructor(private val context: Context, private val preferences: SharedPrefere
         val authLength = auth?.length ?: 0
 
         ULog.d(TAG, "add Data: $auth")
-        if (authLength > 0 && (auth?.startsWith("otpauth://totp")) == false) {
+        if (authLength > 2 && (auth?.startsWith("otpauth://totp")) == false) {
             val decryptString = auth.substring(2)
             try {
                 val json = ThreeDESUtil.decrypt(decryptString)

@@ -43,7 +43,7 @@ class PinsFragment : Fragment(), IOnBackPressed {
             }
         }
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(PinsViewModel::class.java)

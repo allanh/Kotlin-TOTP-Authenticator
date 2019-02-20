@@ -33,7 +33,7 @@ class ScanFragment : Fragment() {
     private lateinit var cameraView: SurfaceView
     var box: Box? = null
 
-    override fun onAttach(context: Context?) {
+    override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         activity?.window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN

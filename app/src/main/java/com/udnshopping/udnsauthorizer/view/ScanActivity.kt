@@ -18,7 +18,8 @@ import com.udnshopping.udnsauthorizer.R
 
 class ScanActivity : AppCompatActivity() {
     private var cameraView: SurfaceView? = null
-    var box: Box? = null
+    private var box: Box? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,7 +31,7 @@ class ScanActivity : AppCompatActivity() {
         startCamera()
     }
 
-    fun startCamera() {
+    private fun startCamera() {
         setContentView(R.layout.fragment_scan)
         box = Box(this)
         addContentView(
@@ -112,10 +113,7 @@ class ScanActivity : AppCompatActivity() {
         }
     }
 
-
     companion object {
-
         private const val TAG = "ScanActivity"
-
     }
 }

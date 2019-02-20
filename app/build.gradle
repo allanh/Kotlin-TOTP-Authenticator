@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'androidx.navigation.safeargs'
-apply plugin: 'io.fabric'
+//apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -12,7 +12,7 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 28
-        versionName "1.0.7.1f771d"
+        versionName "1.0.8.93cca0"
         vectorDrawables.useSupportLibrary true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -89,19 +89,14 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:1.0.0-alpha09"
     implementation "android.arch.work:work-runtime-ktx:1.0.0-beta01"
     implementation "androidx.core:core-ktx:1.0.1"
-    implementation 'com.facebook.shimmer:shimmer:0.4.0'
 
     implementation 'androidx.exifinterface:exifinterface:1.0.0-beta01'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
     implementation 'com.google.android.gms:play-services-vision:17.0.2'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0-beta01'
     implementation 'com.marcelkliemannel:kotlin-onetimepassword:1.0.0'
     implementation 'androidx.mediarouter:mediarouter:1.0.0-beta01'
     implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation 'com.google.firebase:firebase-config:16.3.0'
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.7'
+//    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
     implementation 'org.greenrobot:eventbus:3.1.1'
 
     //Moshi
@@ -111,6 +106,14 @@ dependencies {
     //Kotlin Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutineVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinCoroutineVersion"
+
+    // unit test
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+    androidTestImplementation "androidx.test.ext:junit:1.1.0"
+    androidTestImplementation "androidx.test:rules:1.1.2-alpha01"
 }
 
 apply plugin: 'com.google.gms.google-services'
