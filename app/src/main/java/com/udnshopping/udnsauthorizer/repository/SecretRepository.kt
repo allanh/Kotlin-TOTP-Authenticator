@@ -226,12 +226,12 @@ constructor(private val context: Context, private val preferences: SharedPrefere
     fun getQRCodeErrorEventObservable() = showQRCodeErrorEvent
 
     companion object {
-        const val TAG = "SecretRepository"
-
-        private const val KEY_AUTH = "auth"
+        private const val TAG = "SecretRepository"
         private const val KEY_SECRET = "secret"
         private const val KEY_SECRET_LIST = "secretList"
         private const val KEY_ACCOUNT = "acc"
         private const val KEY_TIME = "time"
+
+        const val KEY_AUTH = "auth"
     }
 }

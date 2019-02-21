@@ -6,6 +6,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.udnshopping.udnsauthorizer.view.scan.DetectorProcessor
 import dagger.Provides
 import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
+import com.udnshopping.udnsauthorizer.view.scan.ScanViewModel
 import com.udnshopping.udnsauthorizer.view.scan.SurfaceHolderCallback
 import dagger.Module
 import org.greenrobot.eventbus.EventBus
@@ -13,6 +14,11 @@ import org.greenrobot.eventbus.EventBus
 
 @Module
 class ScanActivityModule {
+
+    @Provides
+    fun provideScanViewModel(surfaceHolderCallback: SurfaceHolderCallback): ScanViewModel {
+        return ScanViewModel(surfaceHolderCallback)
+    }
 
     @Provides
     fun provideDetectorProcessor(activity: ScanActivity, eventBus: EventBus): DetectorProcessor {
