@@ -1,7 +1,6 @@
 package com.udnshopping.udnsauthorizer.view.scan
 
 import android.content.Intent
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.SurfaceView
 import com.google.android.gms.vision.barcode.BarcodeDetector
@@ -15,9 +14,6 @@ import dagger.android.support.DaggerAppCompatActivity
 import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
 import org.greenrobot.eventbus.EventBus
-import android.util.DisplayMetrics
-
-
 
 /**
  * This activity detects QR codes and returns the value with the rear facing camera.

@@ -3,7 +3,6 @@ package com.udnshopping.udnsauthorizer.di
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
-import com.udnshopping.udnsauthorizer.view.scan.Box
 import com.udnshopping.udnsauthorizer.view.scan.DetectorProcessor
 import dagger.Provides
 import com.udnshopping.udnsauthorizer.view.scan.ScanActivity

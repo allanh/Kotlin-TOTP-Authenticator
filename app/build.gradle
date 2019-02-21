@@ -35,6 +35,11 @@ android {
     androidExtensions {
         experimental = true
     }
+    externalNativeBuild {
+        cmake {
+            path 'src/CMakeLists.txt'
+        }
+    }
 }
 
 dependencies {

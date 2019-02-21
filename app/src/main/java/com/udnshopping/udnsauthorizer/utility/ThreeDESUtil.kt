@@ -8,13 +8,15 @@ import javax.crypto.spec.DESedeKeySpec
 
 object ThreeDESUtil {
 
-    val DES_FLAG = "DESede"                     // 3DES
-    val ENCODE_MODE = Cipher.ENCRYPT_MODE       // 加密模式
-    val DECODE_MODE = Cipher.DECRYPT_MODE       // 解密模式
+    private const val DES_FLAG = "DESede"                     // 3DES
+    private const val ENCODE_MODE = Cipher.ENCRYPT_MODE       // 加密模式
+    private const val DECODE_MODE = Cipher.DECRYPT_MODE       // 解密模式
 
-    val PASSWORD = "lyAOvVCxkYvyTzSeEyRwkfzX"
+    init {
+        System.loadLibrary("native-lib")
+    }
 
-    private fun desEncypt(mode: Int, password: String, content: ByteArray): ByteArray {
+    private fun desEncrypt(mode: Int, password: String, content: ByteArray): ByteArray {
 
         val cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding")
         var result = ByteArray(16)
@@ -33,36 +35,39 @@ object ThreeDESUtil {
 
     private fun enCode(password: String, message: String): String {
         val bytes = message.toByteArray()
-        val desEncypt = desEncypt(
+        val desEncrypt = desEncrypt(
             ENCODE_MODE,
             password,
             bytes
         )
-        val encode = Base64.encode(desEncypt, Base64.DEFAULT)
+        val encode = Base64.encode(desEncrypt, Base64.DEFAULT)
         return String(encode)
     }
 
     private fun deCode(password: String, message: String): String {
         val bytes = Base64.decode(message, Base64.DEFAULT)
-        val desEncypt = desEncypt(
+        val desEncrypt = desEncrypt(
             DECODE_MODE,
             password,
             bytes
         )
-        return String(desEncypt)
+        return String(desEncrypt)
     }
 
+    @Suppress("unused")
     fun encrypt(message: String): String {
         return enCode(
-            PASSWORD,
+            getPassword(),
             message
         )
     }
 
     fun decrypt(message: String): String {
         return deCode(
-            PASSWORD,
+            getPassword(),
             message
         )
     }
+
+    private external fun getPassword(): String
 }
