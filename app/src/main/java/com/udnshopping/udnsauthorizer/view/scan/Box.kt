@@ -7,17 +7,18 @@ import android.graphics.Rect
 import androidx.core.content.ContextCompat
 import android.view.View
 import com.udnshopping.udnsauthorizer.R
+import com.udnshopping.udnsauthorizer.utility.ULog
 
-
-class Box internal constructor(context: Context) : View(context) {
+class Box constructor(context: Context) : View(context) {
     private val paint = Paint()
 
-    var rectangle: Rect = Rect(100, 100, 100, 100)
+    private var _rectangle: Rect = Rect(100, 100, 100, 100)
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         val width = right - left
         val height = bottom - top
-        rectangle = Rect(width / 4, height / 2 - width / 4, right - (width / 4), height / 2 + width / 4)
+        _rectangle = Rect(width / 4, height / 2 - width / 4, right - (width / 4), height / 2 + width / 4)
+        ULog.d("Box", "new rectangle: $_rectangle")
     }
 
     override fun onDraw(canvas: Canvas) { // Override the onDraw() Method
@@ -35,6 +36,8 @@ class Box internal constructor(context: Context) : View(context) {
 //        val dy = canvas.height / 6
         //draw guide box
 //        canvas.drawRect((x0 - dx).toFloat(), (y0 - dy).toFloat(), (x0 + dx).toFloat(), (y0 + dy).toFloat(), paint)
-        canvas.drawRect(rectangle, paint)
+        canvas.drawRect(_rectangle, paint)
     }
+
+    fun getRectangle() = _rectangle
 }

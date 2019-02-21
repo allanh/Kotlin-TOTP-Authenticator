@@ -28,21 +28,19 @@ import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
+import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.HasSupportFragmentInjector
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
+class MainActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    @Inject
-    lateinit var fragmentInjector: DispatchingAndroidInjector<Fragment>
     private lateinit var mainViewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         ULog.d(TAG, "onCreate")
         val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this,
@@ -77,10 +75,6 @@ class MainActivity : AppCompatActivity(), HasSupportFragmentInjector {
                 //showUpdateDialog()
             }
         }
-    }
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> {
-        return fragmentInjector
     }
 
     override fun onBackPressed() {

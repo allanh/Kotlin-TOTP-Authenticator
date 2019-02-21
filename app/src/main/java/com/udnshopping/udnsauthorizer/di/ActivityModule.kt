@@ -10,4 +10,7 @@ import dagger.android.ContributesAndroidInjector
 abstract class ActivityModule {
     @ContributesAndroidInjector(modules = [MainActivityFragmentModule::class])
     internal abstract fun contributeMainActivity(): MainActivity
+
+    @ContributesAndroidInjector(modules = [ScanActivityModule::class])
+    internal abstract fun contributeScanActivity(): ScanActivity
 }

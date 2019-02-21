@@ -61,6 +61,7 @@ class SendCodeFragment : Fragment() {
      * Called by eventBus when an event occurs
      */
     @Subscribe
+    @Suppress("unused")
     fun onKeyEvent(event: KeyUpEvent) {
         when (event.keyCode) {
             KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
