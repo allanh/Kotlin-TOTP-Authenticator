@@ -72,7 +72,7 @@ class SecretAdapter(private var items: List<Pin>?, private val context: Context)
     }
 
     fun updateData(data: List<Pin>?) {
-        if (data == null) {
+        if (data.isNullOrEmpty()) {
             return
         }
         items = data

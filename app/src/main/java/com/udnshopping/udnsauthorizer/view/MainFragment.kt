@@ -28,7 +28,7 @@ class MainFragment : Fragment() {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
         mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
-        mainViewModel.isDataEmptyObservable().observe(this, Observer {
+        mainViewModel.isDataEmptyObservable.observe(this, Observer {
             it?.let { isDataEmpty ->
                 ULog.d(TAG, "isDataEmpty")
                 if (!isDataEmpty) findNavController().navigate(R.id.pinsFragment)

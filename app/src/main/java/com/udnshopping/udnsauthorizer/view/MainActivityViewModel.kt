@@ -25,15 +25,17 @@ constructor(private val configRepository: RemoteConfigRepository, private val se
             config -> config.isEmailInput
     }
 
+    var isDataEmptyObservable: LiveData<Boolean> = Transformations.map(pins) {
+            pinList -> pinList.isEmpty()
+    }
+
     init {
         ULog.d(TAG, "init")
     }
 
     fun fetchRemoteConfig() = configRepository.fetchRemoteConfig()
 
-    fun isDataEmptyObservable(): LiveData<Boolean> = Transformations.map(pins) {
-            pinList -> pinList.isEmpty()
-    }
+
 
     fun getQRCodeErrorEventObservable() = secretRepository.getQRCodeErrorEventObservable()
 

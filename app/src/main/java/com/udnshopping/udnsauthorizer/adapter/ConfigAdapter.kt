@@ -1,6 +1,7 @@
 package com.udnshopping.udnsauthorizer.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,21 +9,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.udnshopping.udnsauthorizer.R
 
-class ConfigAdapter(private val items: Map<String, String>?, private val context: Context) :
+class ConfigAdapter(items: Map<String, String>?, private val context: Context) :
     RecyclerView.Adapter<ConfigAdapter.ViewHolder>() {
 
-    var keyList: List<String>
-
-    init {
-        keyList = items?.keys?.toList() ?: listOf()
-    }
+    private var keyList: List<String> = items?.keys?.toList() ?: listOf()
+    private var valueList: List<String> = items?.values?.toList() ?: listOf()
 
     class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tvConfigName: TextView = view.findViewById(R.id.tv_config_name)
         val tvConfigValue: TextView = view.findViewById(R.id.tv_config_value)
     }
 
-    override fun getItemCount(): Int = items?.size ?: 0
+    override fun getItemCount(): Int = keyList.size
 
     // Inflates the item views
     override fun onCreateViewHolder(viewGroup: ViewGroup, position: Int): ViewHolder {
@@ -37,7 +35,7 @@ class ConfigAdapter(private val items: Map<String, String>?, private val context
 
     // Binds each animal in the ArrayList to a view
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        if (items == null || position > items.size) {
+        if (keyList.isNullOrEmpty() || valueList.isNullOrEmpty() || position > keyList.size) {
             return
         }
 
@@ -46,7 +44,17 @@ class ConfigAdapter(private val items: Map<String, String>?, private val context
         viewHolder.tvConfigName.text = name
 
         // User and date
-        val value = items[name]
+        val value = valueList[position]
         viewHolder.tvConfigValue.text = value
+    }
+
+    fun updateData(data: Map<String, String>?) {
+        if (data.isNullOrEmpty()) {
+            return
+        }
+        Log.d("Config", "update data: $data")
+        keyList = data.keys.toList()
+        valueList = data.values.toList()
+        notifyDataSetChanged()
     }
 }

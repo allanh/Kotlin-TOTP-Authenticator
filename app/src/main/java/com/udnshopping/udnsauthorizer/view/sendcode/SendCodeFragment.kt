@@ -11,23 +11,29 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.FragmentSendCodeBinding
 import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
+import dagger.android.support.AndroidSupportInjection
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
-
+import javax.inject.Inject
 
 class SendCodeFragment : Fragment() {
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SendCodeViewModel
     private lateinit var binding: FragmentSendCodeBinding
 
     override fun onAttach(context: Context) {
+        AndroidSupportInjection.inject(this)
         super.onAttach(context)
-        viewModel = SendCodeViewModel()
-        viewModel.result.observe(this, Observer {
+        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SendCodeViewModel::class.java)
+        viewModel.getResultObservable().observe(this, Observer {
             ULog.d(TAG, "result: $it")
             activity?.onBackPressed()
         })
@@ -39,10 +45,7 @@ class SendCodeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         ULog.d(TAG, "onCreate")
-
-        binding =
-            DataBindingUtil.inflate<FragmentSendCodeBinding>(inflater,
-                R.layout.fragment_send_code, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_send_code, container, false)
         binding.viewModel = viewModel
         EventBus.getDefault().register(this)
         ULog.d(TAG, "onCreate done")
@@ -87,8 +90,6 @@ class SendCodeFragment : Fragment() {
     }
 
     companion object {
-
         private const val TAG = "SendCodeFragment"
-
     }
 }

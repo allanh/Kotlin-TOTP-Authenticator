@@ -25,5 +25,10 @@ internal abstract class ViewModelModule {
     internal abstract fun bindPinsViewModel(pinsViewModel: PinsViewModel): ViewModel
 
     @Binds
+    @IntoMap
+    @ViewModelKey(SendCodeViewModel::class)
+    internal abstract fun bindSendCodeViewModel(sendCodeViewModel: SendCodeViewModel): ViewModel
+
+    @Binds
     internal abstract fun bindViewModelFactory(factory: AppViewModelFactory): ViewModelProvider.Factory
 }

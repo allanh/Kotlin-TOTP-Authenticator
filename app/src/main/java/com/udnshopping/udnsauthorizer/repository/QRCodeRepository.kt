@@ -1,66 +1,91 @@
 package com.udnshopping.udnsauthorizer.repository
 
-import androidx.lifecycle.LiveData
+import android.content.Context
+import androidx.lifecycle.MutableLiveData
 import com.udnshopping.udnsauthorizer.utility.ULog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
 import java.net.URL
+import javax.inject.Inject
 import javax.net.ssl.HttpsURLConnection
 
 /**
- * TitleRepository provides an interface to fetch a title or request a new one be generated.
- *
- * Repository modules handle data operations. They provide a clean API so that the rest of the app
- * can retrieve this data easily. They know where to get the data from and what API calls to make
- * when data is updated. You can consider repositories to be mediators between different data
- * sources, in our case it mediates between a network API and an offline database cache.
+ * QRCodeRepository provides an interface to send an email to TOTP server.
  */
-class QRCodeRepository() {
+@Suppress("unused")
+class QRCodeRepository @Inject constructor(private val context: Context) {
 
     /**
-     * [LiveData] to load title.
+     * This is the job for all coroutines started by this repository.
      *
-     * This is the main interface for loading a title. The title will be loaded from the offline
-     * cache.
-     *
-     * Observing this will not cause the title to be refreshed, use [TitleRepository.refreshTitle]
-     * to refresh the title.
-     *
-     * Because this is defined as `by lazy` it won't be instantiated until the property is
-     * used for the first time.
+     * Cancelling this job will cancel all coroutines started by this repository.
      */
-//    val title: LiveData<String> by lazy<LiveData<String>>(LazyThreadSafetyMode.NONE) {
-//        //Transformations.map(titleDao.loadTitle()) { it.title }
-//    }
+    private val job = Job()
 
     /**
-     * Refresh the current title and save the results to the offline cache.
+     * This is the main scope for all coroutines launched by QRCodeRepository.
      *
-     * This method does not return the new title. Use [TitleRepository.title] to observe
-     * the current tile.
+     * Since we pass job, you can cancel all coroutines launched by uiScope by calling
+     * job.cancel()
      */
-    suspend fun sendEmail(email: String) {
-        val url = URL("${TOTP_API}$email")
+    private val scope = CoroutineScope(Dispatchers.Main + job)
+
+    var result = MutableLiveData<String>()
+
+    private fun sendEmailToTOTP(email: String): String? {
+        var result: String? = null
+        val url = URL("$TOTP_API$email")
         val urlConnection = url.openConnection() as HttpsURLConnection
-        var result = null
 
         try {
-            val inputStream = BufferedInputStream(urlConnection.getInputStream())
+            // Sets the SSLSocketFactory
+//            val input = activity?.resources?.openRawResource(R.raw.udn)
+//            input?.let {
+//                ULog.d(TAG, "input: ${input.available()}")
+//                UdnSSLContextFactory.getSSLContext(it)?.let { context ->
+//                    urlConnection.sslSocketFactory = context.socketFactory
+//                }
+//            }
+            val inputStream = BufferedInputStream(urlConnection.inputStream)
             val buffer = ByteArrayOutputStream()
             var resultStream = inputStream.read()
             while (resultStream != -1) {
                 buffer.write(resultStream.toByte().toInt())
                 resultStream = inputStream.read()
             }
-            ULog.d(TAG, "response: ${buffer.toString("UTF-8")}")
+            result = buffer.toString("UTF-8")
+            ULog.d(TAG, "result: $result")
 
             inputStream.close()
         } catch (exception: Exception) {
-
+            ULog.d(TAG, "error message: ${exception.message}")
+            result = exception.localizedMessage.toString()
         } finally {
             urlConnection.disconnect()
+            ULog.d(TAG, "finally")
+            return result
         }
+    }
+
+    //    val hostnameVerifier = HostnameVerifier { _, session ->
+//        HttpsURLConnection.getDefaultHostnameVerifier().run {
+//            verify("udn.com", session)
+//        }
+//    }
+
+    fun sendEmail(email: String) {
+        scope.launch(Dispatchers.IO) {
+            result.postValue(sendEmailToTOTP(email))
+        }
+    }
+
+    fun cancel() {
+        job.cancel()
     }
 
     companion object {

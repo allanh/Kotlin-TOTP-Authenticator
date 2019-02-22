@@ -5,12 +5,11 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.udnshopping.udnsauthorizer.model.Config
 import android.view.MenuInflater
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.adapter.ConfigAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentConfigBinding
@@ -19,34 +18,36 @@ import com.udnshopping.udnsauthorizer.utility.ULog
 
 class ConfigFragment  : Fragment() {
 
+    private lateinit var viewModel: ConfigViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
-
-        var binding =
+        val binding =
                 DataBindingUtil.inflate<FragmentConfigBinding>(inflater,
                     R.layout.fragment_config, container, false)
 
-        var configs = Config(mapOf("version" to BuildConfig.VERSION_NAME))
+        viewModel = ConfigViewModel()
+        viewModel.getConfigObservable().observe(this, Observer {
+            ULog.d(TAG, "new config: $it")
+            (binding.configRecyclerView.adapter as ConfigAdapter).updateData(it)
+        })
 
         // Creates a vertical Layout Manager
         binding.configRecyclerView.layoutManager = LinearLayoutManager(activity)
         // Access the RecyclerView Adapter and load the data into it
         binding.configRecyclerView.adapter =
-                ConfigAdapter(configs.config, activity as Context)
+                ConfigAdapter(viewModel.getConfigObservable().value, activity as Context)
 
         binding.configToolbar.setNavigationOnClickListener {
             ULog.d(TAG, "Navigation click")
             activity?.supportFragmentManager?.popBackStack()
         }
 
-//        (activity as AppCompatActivity).setSupportActionBar(binding.configToolbar)
-//        (activity as AppCompatActivity).supportActionBar?.title = "config"
-//        setHasOptionsMenu(true);
-        return binding.root;
+        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

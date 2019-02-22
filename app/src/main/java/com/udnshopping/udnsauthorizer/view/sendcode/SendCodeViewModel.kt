@@ -1,94 +1,19 @@
 package com.udnshopping.udnsauthorizer.view.sendcode
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.udnshopping.udnsauthorizer.repository.SecretRepository
-import com.udnshopping.udnsauthorizer.utility.ULog
-import kotlinx.coroutines.*
-import java.io.*
-import java.lang.Exception
-import java.net.URL
+import com.udnshopping.udnsauthorizer.repository.QRCodeRepository
 import javax.inject.Inject
-import javax.net.ssl.*
 
-
-
-
-class SendCodeViewModel : ViewModel() {
-
-    /**
-     * This is the job for all coroutines started by this ViewModel.
-     *
-     * Cancelling this job will cancel all coroutines started by this ViewModel.
-     */
-    private val viewModelJob = Job()
-
-    /**
-     * This is the main scope for all coroutines launched by SendCodeViewModel.
-     *
-     * Since we pass viewModelJob, you can cancel all coroutines launched by uiScope by calling
-     * viewModelJob.cancel()
-     */
-    private val scope = CoroutineScope(Dispatchers.Main + viewModelJob)
-
-    var result = MutableLiveData<String>()
+class SendCodeViewModel @Inject
+constructor(private val repository: QRCodeRepository) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        viewModelJob.cancel()
+        repository.cancel()
     }
 
-    fun sendEmail(email: String) {
-         scope.launch(Dispatchers.IO) {
-            result.postValue(sendEmailToTOTP(email))
-        }
-    }
+    fun sendEmail(email: String)  = repository.sendEmail(email)
 
-    private fun sendEmailToTOTP(email: String) : String? {
-        var result: String? = null
-        val url = URL("$TOTP_API$email")
-        val urlConnection = url.openConnection() as HttpsURLConnection
+    fun getResultObservable() = repository.result
 
-        try {
-            // Sets the SSLSocketFactory
-//            val input = activity?.resources?.openRawResource(R.raw.udn)
-//            input?.let {
-//                ULog.d(TAG, "input: ${input.available()}")
-//                UdnSSLContextFactory.getSSLContext(it)?.let { context ->
-//                    urlConnection.sslSocketFactory = context.socketFactory
-//                }
-//            }
-            val inputStream = BufferedInputStream(urlConnection.inputStream)
-            val buffer = ByteArrayOutputStream()
-            var resultStream = inputStream.read()
-            while (resultStream != -1) {
-                buffer.write(resultStream.toByte().toInt())
-                resultStream = inputStream.read()
-            }
-            result = buffer.toString("UTF-8")
-            ULog.d(TAG, "result: $result")
-
-            inputStream.close()
-        } catch (exception: Exception) {
-            ULog.d(TAG, "error message: ${exception.message}")
-            result = exception.localizedMessage.toString()
-        } finally {
-            urlConnection.disconnect()
-            ULog.d(TAG, "finally")
-            return result
-        }
-    }
-
-//    val hostnameVerifier = HostnameVerifier { _, session ->
-//        HttpsURLConnection.getDefaultHostnameVerifier().run {
-//            verify("udn.com", session)
-//        }
-//    }
-
-    companion object {
-
-        private const val TAG = "SendCodeViewModel"
-
-        private const val TOTP_API = "https://uat-shopping56.udn.com/spm/TOTPGenQrcodeMail.do?source="
-    }
 }

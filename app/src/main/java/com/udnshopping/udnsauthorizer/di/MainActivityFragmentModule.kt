@@ -20,6 +20,6 @@ abstract class MainActivityFragmentModule {
     @ContributesAndroidInjector
     abstract fun contributePinsFragment(): PinsFragment
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [SendCodeModule::class])
     abstract fun contributeSendCodeFragment(): SendCodeFragment
 }

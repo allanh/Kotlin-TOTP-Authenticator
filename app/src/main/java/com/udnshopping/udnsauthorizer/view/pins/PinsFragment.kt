@@ -2,7 +2,6 @@ package com.udnshopping.udnsauthorizer.view.pins
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -13,36 +12,19 @@ import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.utility.ULog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback
 import com.udnshopping.udnsauthorizer.adapter.SecretAdapter
 import com.udnshopping.udnsauthorizer.databinding.FragmentPinsBinding
-import com.udnshopping.udnsauthorizer.callback.IOnBackPressed
 import com.udnshopping.udnsauthorizer.view.MainActivity
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-class PinsFragment : Fragment(), IOnBackPressed {
+class PinsFragment : Fragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: PinsViewModel
-    private lateinit var binding: FragmentPinsBinding
-    private var handler = Handler()
-    private var isPosted = false
-    private var isRefreshing = true
-        set(value) {
-            synchronized(value) {
-                if (value) {
-                    handler.postDelayed(updateThread,
-                        UPDATE_TIME
-                    )
-                    isPosted = true
-                } else if (isPosted) {
-                    handler.removeCallbacks(updateThread)
-                    isPosted = false
-                }
-            }
-        }
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -52,27 +34,19 @@ class PinsFragment : Fragment(), IOnBackPressed {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-
         ULog.d(TAG, "onCreate")
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_pins, container, false)
-        ULog.d(TAG, "pin size: ${viewModel.getPinsObservable().value?.size}")
+        val binding = DataBindingUtil.inflate<FragmentPinsBinding>(inflater,
+            R.layout.fragment_pins, container, false)
         viewModel.getPinsObservable().observe(this, Observer {
-
             (binding.pinsRecyclerView.adapter as SecretAdapter).updateData(it)
-            if (it.size == 0) {
-                if (isPosted) isRefreshing = false
-            } else {
-                if (!isPosted) isRefreshing = true
-            }
         })
         binding.viewModel = viewModel
-        binding.setLifecycleOwner(this)
+        binding.lifecycleOwner = this
 
         //ULog.d(TAG, "setListView: ${it.size}")
-        setListView(viewModel.getPinsObservable().value)
+        setListView(binding.pinsRecyclerView, viewModel.getPinsObservable().value)
 
         ULog.d(TAG, "onCreate done")
-
         return binding.root
     }
 
@@ -95,21 +69,13 @@ class PinsFragment : Fragment(), IOnBackPressed {
         }
     }
 
-    override fun onBackPressed() = false
-
-    private fun setListView(pins: MutableList<Pin>?) {
+    private fun setListView(pinsRecyclerView: RecyclerView, pins: MutableList<Pin>?) {
         val fragmentContext = context as Context
 
         // Creates a vertical Layout Manager
-        binding.pinsRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
+        pinsRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
         // Access the RecyclerView Adapter and load the data into it
-        binding.pinsRecyclerView.adapter = SecretAdapter(pins, fragmentContext)
-//        binding.pinsRecyclerView.addItemDecoration(
-//            androidx.recyclerview.widget.DividerItemDecoration(
-//                fragmentContext,
-//                androidx.recyclerview.widget.DividerItemDecoration.VERTICAL
-//            )
-//        )
+        pinsRecyclerView.adapter = SecretAdapter(pins, fragmentContext)
 
         val swipeHandler = object : SwipeToDeleteCallback(fragmentContext) {
             override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
@@ -118,33 +84,22 @@ class PinsFragment : Fragment(), IOnBackPressed {
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeHandler)
-        itemTouchHelper.attachToRecyclerView(binding.pinsRecyclerView)
+        itemTouchHelper.attachToRecyclerView(pinsRecyclerView)
     }
 
     override fun onResume() {
         super.onResume()
-        isRefreshing = true
+        viewModel.enableRefresh(true)
         (activity as AppCompatActivity).supportActionBar?.show()
     }
 
-    override fun onStop() {
-        isRefreshing = false
-        super.onStop()
-    }
-
-    private val updateThread = object: Runnable {
-        override fun run() {
-            viewModel.updatePins()
-            handler.postDelayed(this, UPDATE_TIME)
-        }
+    override fun onPause() {
+        viewModel.enableRefresh(false)
+        super.onPause()
     }
 
     companion object {
-
         private const val TAG = "PinsFragment"
-
-        private const val UPDATE_TIME = 1000L
-
     }
 }
 

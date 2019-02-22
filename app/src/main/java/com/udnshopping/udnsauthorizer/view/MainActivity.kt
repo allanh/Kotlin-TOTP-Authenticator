@@ -3,7 +3,6 @@ package com.udnshopping.udnsauthorizer.view
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
 import android.view.KeyEvent
@@ -13,7 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -25,11 +23,7 @@ import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
-import dagger.android.support.HasSupportFragmentInjector
 import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
@@ -67,16 +61,6 @@ class MainActivity : DaggerAppCompatActivity() {
         ULog.d(TAG, "onCreate done")
     }
 
-    private fun checkUpdate(isForceUpdate: Boolean) {
-        ULog.d(TAG, "check isForceUpdate: $isForceUpdate")
-        if (isForceUpdate) {
-            if (mainViewModel.checkApkVersion(getVersion())) {
-                ULog.d(TAG, "show update dialog")
-                //showUpdateDialog()
-            }
-        }
-    }
-
     override fun onBackPressed() {
         when (getCurrentFragmentId(R.id.nav_host_fragment)) {
             R.id.mainFragment, R.id.pinsFragment -> {
@@ -102,7 +86,7 @@ class MainActivity : DaggerAppCompatActivity() {
         val isForceUpdate = mainViewModel.isForceUpdateObservable.value ?: false
         checkUpdate(isForceUpdate)
 
-        val isDataEmpty = mainViewModel.isDataEmptyObservable().value ?: true
+        val isDataEmpty = mainViewModel.isDataEmptyObservable.value ?: true
         if (!isCurrentFragment(R.id.nav_host_fragment, R.id.mainFragment)
             && isDataEmpty) {
             findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
@@ -170,39 +154,6 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
-    private fun showPermissionDialog() {
-        val builder = AlertDialog.Builder(this)
-            .setTitle(R.string.permission_dialog_title)
-            .setMessage(getString(R.string.permission_dialog_content))
-            .setPositiveButton(R.string.setting) { _, _ ->
-                goSetting()
-            }
-            .setNegativeButton(R.string.cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
-        builder.show()
-    }
-
-    private fun errorQRCodeAlert() {
-        val builder = AlertDialog.Builder(this)
-            .setMessage(getString(R.string.qrcode_error))
-            .setNeutralButton(R.string.ok) { dialog, _ ->
-                dialog.dismiss()
-            }
-        builder.show()
-    }
-
-    private fun showUpdateDialog() {
-        val builder = AlertDialog.Builder(this)
-            .setTitle(R.string.update_dialog_title)
-            .setCancelable(false)
-            .setMessage(getString(R.string.update_dialog_content))
-            .setNegativeButton(R.string.update) { _, _ ->
-                redirectStore()
-            }
-        builder.show()
-    }
-
     fun scan() {
         val intent = Intent(this, ScanActivity::class.java)
         startActivityForResult(intent, SCAN_QR_CODE)
@@ -240,6 +191,39 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
+    private fun showPermissionDialog() {
+        val builder = AlertDialog.Builder(this)
+            .setTitle(R.string.permission_dialog_title)
+            .setMessage(getString(R.string.permission_dialog_content))
+            .setPositiveButton(R.string.setting) { _, _ ->
+                goSetting()
+            }
+            .setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+        builder.show()
+    }
+
+    private fun errorQRCodeAlert() {
+        val builder = AlertDialog.Builder(this)
+            .setMessage(getString(R.string.qrcode_error))
+            .setNeutralButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+            }
+        builder.show()
+    }
+
+    private fun showUpdateDialog() {
+        val builder = AlertDialog.Builder(this)
+            .setTitle(R.string.update_dialog_title)
+            .setCancelable(false)
+            .setMessage(getString(R.string.update_dialog_content))
+            .setNegativeButton(R.string.update) { _, _ ->
+                redirectStore()
+            }
+        builder.show()
+    }
+
     private fun getVersion(): String {
         try {
             val pInfo = packageManager?.getPackageInfo(packageName, 0)
@@ -266,6 +250,16 @@ class MainActivity : DaggerAppCompatActivity() {
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
+    }
+
+    private fun checkUpdate(isForceUpdate: Boolean) {
+        ULog.d(TAG, "check isForceUpdate: $isForceUpdate")
+        if (isForceUpdate) {
+            if (mainViewModel.checkApkVersion(getVersion())) {
+                ULog.d(TAG, "show update dialog")
+                //showUpdateDialog()
+            }
+        }
     }
 
     companion object {

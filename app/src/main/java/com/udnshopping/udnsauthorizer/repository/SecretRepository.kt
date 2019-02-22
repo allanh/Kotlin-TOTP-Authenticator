@@ -50,7 +50,7 @@ constructor(private val context: Context, private val preferences: SharedPrefere
     private var pins = MutableLiveData<MutableList<Pin>>()
 
     init {
-        ULog.d(RemoteConfigRepository.TAG, "Injection SecretRepository")
+        ULog.d(TAG, "Injection SecretRepository")
         initData()
     }
 
@@ -82,6 +82,21 @@ constructor(private val context: Context, private val preferences: SharedPrefere
         return if (json.isNotBlank()) Gson().fromJson(json, type) else mutableListOf()
     }
 
+    /**
+     * Update the pins state with the [lastTimeMap].
+     */
+    private fun updatePinListState(lastTimeMap: MutableMap<String, Long>, pinList: MutableList<Pin>) {
+        val tempPins = pinList.toMutableList()
+        for (pin in tempPins) {
+            if (pin.date.isNotEmpty()) {
+                val pinTime = pinDateFormat.parse(pin.date).time
+                pin.isValid = (pinTime == lastTimeMap[pin.value])
+            } else {
+                pin.isValid = true
+            }
+        }
+        pins.postValue(tempPins)
+    }
 
     /**
      * Add an [extra] data to secrets.
@@ -174,22 +189,6 @@ constructor(private val context: Context, private val preferences: SharedPrefere
             }
         }
         updatePinListState(lastTimeMap, pinList)
-    }
-
-    /**
-     * Update the pins state with the [lastTimeMap].
-     */
-    private fun updatePinListState(lastTimeMap: MutableMap<String, Long>, pinList: MutableList<Pin>) {
-        val tempPins = pinList.toMutableList()
-        for (pin in tempPins) {
-            if (pin.date.isNotEmpty()) {
-                val pinTime = pinDateFormat.parse(pin.date).time
-                pin.isValid = (pinTime == lastTimeMap[pin.value])
-            } else {
-                pin.isValid = true
-            }
-        }
-        pins.postValue(tempPins)
     }
     
     /**
