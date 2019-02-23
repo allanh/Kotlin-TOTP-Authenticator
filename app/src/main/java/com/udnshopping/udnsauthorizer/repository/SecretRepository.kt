@@ -10,7 +10,7 @@ import com.google.gson.reflect.TypeToken
 import com.marcelkliemannel.kotlinonetimepassword.HmacAlgorithm
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordConfig
 import com.marcelkliemannel.kotlinonetimepassword.TimeBasedOneTimePasswordGenerator
-import com.udnshopping.udnsauthorizer.extension.SingleLiveEvent
+import com.udnshopping.udnsauthorizer.model.SingleLiveEvent
 import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.model.Secret
 import com.udnshopping.udnsauthorizer.utility.LocaleUtil

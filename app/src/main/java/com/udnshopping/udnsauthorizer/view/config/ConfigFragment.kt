@@ -16,7 +16,7 @@ import com.udnshopping.udnsauthorizer.databinding.FragmentConfigBinding
 import com.udnshopping.udnsauthorizer.utility.ULog
 
 
-class ConfigFragment  : Fragment() {
+class ConfigFragment : Fragment() {
 
     private lateinit var viewModel: ConfigViewModel
 
@@ -25,7 +25,6 @@ class ConfigFragment  : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val binding =
                 DataBindingUtil.inflate<FragmentConfigBinding>(inflater,
                     R.layout.fragment_config, container, false)
@@ -81,8 +80,6 @@ class ConfigFragment  : Fragment() {
     }
 
     companion object {
-
         private const val TAG = "ConfigFragment"
-
     }
 }
