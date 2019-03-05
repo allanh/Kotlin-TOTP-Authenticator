@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
+import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
 import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
@@ -257,7 +258,7 @@ class MainActivity : DaggerAppCompatActivity() {
         if (isForceUpdate) {
             if (mainViewModel.checkApkVersion(getVersion())) {
                 ULog.d(TAG, "show update dialog")
-                //showUpdateDialog()
+                if (!BuildConfig.DEBUG) showUpdateDialog()
             }
         }
     }

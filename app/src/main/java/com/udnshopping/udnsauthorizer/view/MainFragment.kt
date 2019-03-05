@@ -46,7 +46,7 @@ class MainFragment : Fragment() {
             DataBindingUtil.inflate<FragmentMainBinding>(inflater, R.layout.fragment_main, container, false)
         binding.fragment = this
         binding.viewModel = mainViewModel
-        binding.setLifecycleOwner(this)
+        binding.lifecycleOwner = this
 
         ULog.d(TAG, "onCreate done")
         return binding.root
