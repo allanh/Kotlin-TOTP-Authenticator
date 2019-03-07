@@ -12,4 +12,12 @@
         <key>force_update</key>
         <value>false</value>
     </entry>
+    <entry>
+        <key>broadcast</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>broadcast_message</key>
+        <value>{}</value>
+    </entry>
 </defaultsMap>

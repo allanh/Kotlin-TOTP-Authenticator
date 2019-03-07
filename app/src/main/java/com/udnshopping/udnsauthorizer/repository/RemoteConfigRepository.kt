@@ -3,8 +3,10 @@ package com.udnshopping.udnsauthorizer.repository
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.google.gson.Gson
 import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
+import com.udnshopping.udnsauthorizer.model.BroadcastMessage
 import com.udnshopping.udnsauthorizer.model.UdnRemoteConfig
 import com.udnshopping.udnsauthorizer.utility.ULog
 import javax.inject.Inject
@@ -60,8 +62,14 @@ constructor(private val remoteConfig: FirebaseRemoteConfig) {
                     val forceUpdateVersion = remoteConfig.getString(FORCE_UPDATE_VERSION_KEY)
                     val isEmailInput = remoteConfig.getBoolean(EMAIL_INPUT_KEY)
                     val isForceUpdate = remoteConfig.getBoolean(FORCE_UPDATE_KEY)
+                    val broadcast = remoteConfig.getBoolean(BROADCAST_KEY)
+                    val broadcastMessageString = remoteConfig.getString(BROADCAST_MESSAGE_KEY)
+                    val broadcastMessage = Gson().fromJson(broadcastMessageString, BroadcastMessage::class.java)
+
                     ULog.d(TAG, "forceUpdateVersion: $forceUpdateVersion, isEmailInput: $isEmailInput, isForceUpdate: $isForceUpdate")
-                    udnRemoteConfig.postValue(UdnRemoteConfig(isEmailInput, isForceUpdate, forceUpdateVersion))
+                    ULog.d(TAG, "broadcast: $broadcast, broadcastMessage: $broadcastMessage")
+                    val config = UdnRemoteConfig(isEmailInput, isForceUpdate, forceUpdateVersion, broadcast, broadcastMessage)
+                    udnRemoteConfig.postValue(config)
                 } else {
                     ULog.e(TAG, "Fetch Failed")
                 }
@@ -75,9 +83,9 @@ constructor(private val remoteConfig: FirebaseRemoteConfig) {
 
         // Remote Config keys
         private const val EMAIL_INPUT_KEY = "email_input_enabled"
-
         private const val FORCE_UPDATE_KEY = "force_update"
-
         private const val FORCE_UPDATE_VERSION_KEY = "Android_force_update_version"
+        private const val BROADCAST_KEY = "broadcast"
+        private const val BROADCAST_MESSAGE_KEY = "broadcast_message"
     }
 }

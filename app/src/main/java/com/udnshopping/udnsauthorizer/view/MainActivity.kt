@@ -52,6 +52,9 @@ class MainActivity : DaggerAppCompatActivity() {
         mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
         mainViewModel.isForceUpdateObservable.observe(this, Observer {
             checkUpdate(it)
+            if (mainViewModel.isShowBroadcast()) {
+                showDefaultDialog(mainViewModel.getBroadcastTitle(), mainViewModel.getBroadcastBody())
+            }
         })
         mainViewModel.getQRCodeErrorEventObservable().observe(this, Observer {
             errorQRCodeAlert()
@@ -221,6 +224,16 @@ class MainActivity : DaggerAppCompatActivity() {
             .setMessage(getString(R.string.update_dialog_content))
             .setNegativeButton(R.string.update) { _, _ ->
                 redirectStore()
+            }
+        builder.show()
+    }
+
+    private fun showDefaultDialog(title: String, message: String) {
+        val builder = AlertDialog.Builder(this)
+            .setTitle(title)
+            .setMessage(message)
+            .setNegativeButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
             }
         builder.show()
     }
