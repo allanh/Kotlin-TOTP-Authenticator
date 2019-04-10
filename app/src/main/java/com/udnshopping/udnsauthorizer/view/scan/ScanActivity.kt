@@ -1,8 +1,10 @@
 package com.udnshopping.udnsauthorizer.view.scan
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.View.FOCUSABLE
 import android.view.ViewGroup
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.model.DetectEvent

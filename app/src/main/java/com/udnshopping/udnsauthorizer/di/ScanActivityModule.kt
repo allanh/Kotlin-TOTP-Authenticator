@@ -1,8 +1,10 @@
 package com.udnshopping.udnsauthorizer.di
 
+import android.hardware.Camera
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
+import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.view.scan.DetectorProcessor
 import dagger.Provides
 import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
@@ -10,7 +12,6 @@ import com.udnshopping.udnsauthorizer.view.scan.ScanViewModel
 import com.udnshopping.udnsauthorizer.view.scan.SurfaceHolderCallback
 import dagger.Module
 import org.greenrobot.eventbus.EventBus
-
 
 @Module
 class ScanActivityModule {
@@ -45,5 +46,9 @@ class ScanActivityModule {
     @Provides
     fun provideSurfaceHolderCallback(cameraSource: CameraSource): SurfaceHolderCallback {
         return SurfaceHolderCallback(cameraSource)
+    }
+
+    companion object {
+        private const val TAG = "ScanActivityModule"
     }
 }
