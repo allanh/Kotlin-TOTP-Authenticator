@@ -44,7 +44,7 @@ constructor(private val configRepository: RemoteConfigRepository, private val se
 
     fun getQRCodeErrorEventObservable() = secretRepository.getQRCodeErrorEventObservable()
 
-    fun addData(extra: Bundle?) = secretRepository.addData(extra)
+    fun addData(auth: String) = secretRepository.addData(auth)
 
     /**
      * Save the secrets to shared preferences.

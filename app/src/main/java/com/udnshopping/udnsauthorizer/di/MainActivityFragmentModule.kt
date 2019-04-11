@@ -3,6 +3,8 @@ package com.udnshopping.udnsauthorizer.di
 import com.udnshopping.udnsauthorizer.view.*
 import com.udnshopping.udnsauthorizer.view.config.ConfigFragment
 import com.udnshopping.udnsauthorizer.view.pins.PinsFragment
+import com.udnshopping.udnsauthorizer.view.scan.GVScanFragment
+import com.udnshopping.udnsauthorizer.view.scan.ScanFragment
 import com.udnshopping.udnsauthorizer.view.sendcode.SendCodeFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -22,4 +24,10 @@ abstract class MainActivityFragmentModule {
 
     @ContributesAndroidInjector(modules = [SendCodeModule::class])
     abstract fun contributeSendCodeFragment(): SendCodeFragment
+
+    @ContributesAndroidInjector
+    abstract fun contributeScanFragment(): ScanFragment
+
+    @ContributesAndroidInjector(modules = [GVScanFragmentModule::class])
+    internal abstract fun contributeGVScanFragment(): GVScanFragment
 }

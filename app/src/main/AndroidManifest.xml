@@ -25,7 +25,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".view.scan.ScanActivity"
+                android:name=".view.scan.GVScanFragment"
                 android:label="@string/title_activity_scan"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>

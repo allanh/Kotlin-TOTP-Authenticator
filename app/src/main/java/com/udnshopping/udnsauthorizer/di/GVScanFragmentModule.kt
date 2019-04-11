@@ -1,20 +1,15 @@
 package com.udnshopping.udnsauthorizer.di
 
-import android.hardware.Camera
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
-import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.view.scan.DetectorProcessor
+import com.udnshopping.udnsauthorizer.view.scan.*
 import dagger.Provides
-import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
-import com.udnshopping.udnsauthorizer.view.scan.ScanViewModel
-import com.udnshopping.udnsauthorizer.view.scan.SurfaceHolderCallback
 import dagger.Module
 import org.greenrobot.eventbus.EventBus
 
 @Module
-class ScanActivityModule {
+class GVScanFragmentModule {
 
     @Provides
     fun provideScanViewModel(surfaceHolderCallback: SurfaceHolderCallback): ScanViewModel {
@@ -22,13 +17,13 @@ class ScanActivityModule {
     }
 
     @Provides
-    fun provideDetectorProcessor(activity: ScanActivity, eventBus: EventBus): DetectorProcessor {
-        return DetectorProcessor(activity, eventBus)
+    fun provideDetectorProcessor(fragment: GVScanFragment, eventBus: EventBus): DetectorProcessor {
+        return DetectorProcessor(fragment, eventBus)
     }
 
     @Provides
-    fun provideBarcodeDetector(activity: ScanActivity, detectorProcessor: DetectorProcessor): BarcodeDetector {
-        val detector = BarcodeDetector.Builder(activity)
+    fun provideBarcodeDetector(fragment: GVScanFragment, detectorProcessor: DetectorProcessor): BarcodeDetector {
+        val detector = BarcodeDetector.Builder(fragment.context)
             .setBarcodeFormats(Barcode.ALL_FORMATS)
             .build()
         detector.setProcessor(detectorProcessor)
@@ -36,8 +31,8 @@ class ScanActivityModule {
     }
 
     @Provides
-    fun provideCameraSource(activity: ScanActivity, detector: BarcodeDetector): CameraSource {
-        return CameraSource.Builder(activity, detector)
+    fun provideCameraSource(fragment: GVScanFragment, detector: BarcodeDetector): CameraSource {
+        return CameraSource.Builder(fragment.context, detector)
             .setRequestedPreviewSize(1600, 1024)
             .setAutoFocusEnabled(true) //you should add this feature
             .build()
@@ -49,6 +44,6 @@ class ScanActivityModule {
     }
 
     companion object {
-        private const val TAG = "ScanActivityModule"
+        private const val TAG = "GVScanFragmentModule"
     }
 }

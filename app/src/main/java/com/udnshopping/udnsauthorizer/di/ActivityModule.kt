@@ -1,7 +1,7 @@
 package com.udnshopping.udnsauthorizer.di
 
 import com.udnshopping.udnsauthorizer.view.MainActivity
-import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
+import com.udnshopping.udnsauthorizer.view.scan.GVScanFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -10,7 +10,4 @@ import dagger.android.ContributesAndroidInjector
 abstract class ActivityModule {
     @ContributesAndroidInjector(modules = [MainActivityFragmentModule::class])
     internal abstract fun contributeMainActivity(): MainActivity
-
-    @ContributesAndroidInjector(modules = [ScanActivityModule::class])
-    internal abstract fun contributeScanActivity(): ScanActivity
 }

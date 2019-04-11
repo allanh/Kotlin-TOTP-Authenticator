@@ -11,14 +11,14 @@ import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 class DetectorProcessor @Inject
-constructor(private var activity: ScanActivity, private val eventBus: EventBus) : Detector.Processor<Barcode> {
+constructor(private var fragment: GVScanFragment, private val eventBus: EventBus) : Detector.Processor<Barcode> {
 
     override
     fun receiveDetections(detections: Detector.Detections<Barcode>) {
         val barCodes = detections.detectedItems
         if (barCodes.size() != 0) {
             val barcode = barCodes.valueAt(0)
-            val box = activity.getBox()
+            val box = fragment.box
             val rectangle: Rect? = box?.getRectangle()
             val metaData = detections.frameMetadata
             val matrix = Matrix()
@@ -42,8 +42,12 @@ constructor(private var activity: ScanActivity, private val eventBus: EventBus) 
                         )
                     )
                 ) {
-                    val auth = barCodes.valueAt(0).displayValue
-                    eventBus.post(DetectEvent(auth))
+                    ULog.d(TAG, "isDetected: " + fragment.isDetected)
+                    if (!fragment.isDetected) {
+                        fragment.onDetected()
+                        val auth = barCodes.valueAt(0).displayValue
+                        eventBus.post(DetectEvent(auth))
+                    }
                 }
             }
         }

@@ -99,15 +99,14 @@ constructor(private val context: Context, private val preferences: SharedPrefere
     }
 
     /**
-     * Add an [extra] data to secrets.
+     * Add an [auth] data to secrets.
      */
-    fun addData(extra: Bundle?) {
-        val auth = extra?.getString(KEY_AUTH)
+    fun addData(auth: String) {
         var secret: Secret? = null
-        val authLength = auth?.length ?: 0
+        val authLength = auth.length ?: 0
 
         ULog.d(TAG, "add Data: $auth")
-        if (authLength > 2 && (auth?.startsWith("otpauth://totp")) == false) {
+        if (authLength > 2 && !auth.startsWith("otpauth://totp")) {
             val decryptString = auth.substring(2)
             try {
                 val json = ThreeDESUtil.decrypt(decryptString)

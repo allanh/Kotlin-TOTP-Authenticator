@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
+import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -21,11 +22,12 @@ import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
 import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
 import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
+import com.udnshopping.udnsauthorizer.model.DetectEvent
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
-import com.udnshopping.udnsauthorizer.view.scan.ScanActivity
 import dagger.android.support.DaggerAppCompatActivity
 import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
 
 
@@ -33,6 +35,8 @@ class MainActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
+    @Inject
+    lateinit var eventBus: EventBus
     private lateinit var mainViewModel: MainActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,6 +67,7 @@ class MainActivity : DaggerAppCompatActivity() {
 
         binding.viewModel = mainViewModel
         ULog.d(TAG, "onCreate done")
+        eventBus.register(this)
     }
 
     override fun onBackPressed() {
@@ -102,19 +107,9 @@ class MainActivity : DaggerAppCompatActivity() {
         mainViewModel.saveData()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (requestCode) {
-            SCAN_QR_CODE -> {
-                if (data == null) {
-                    return
-                }
-                mainViewModel.addData(data.extras)
-                findNavController(R.id.nav_host_fragment).navigate(R.id.pinsFragment)
-            }
-            else -> { }
-        }
+    override fun onDestroy() {
+        eventBus.unregister(this)
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -157,11 +152,6 @@ class MainActivity : DaggerAppCompatActivity() {
                 }
             }
         }
-    }
-
-    fun scan() {
-        val intent = Intent(this, ScanActivity::class.java)
-        startActivityForResult(intent, SCAN_QR_CODE)
     }
 
     fun checkPermission() {
@@ -249,6 +239,14 @@ class MainActivity : DaggerAppCompatActivity() {
         return "1.0.0"
     }
 
+    fun scan() {
+//        findNavController(R.id.nav_host_fragment).navigate(R.id.scanFragment)
+        findNavController(R.id.nav_host_fragment).navigate(R.id.gvScanFragment)
+
+//        val intent = Intent(this, GVScanFragment::class.java)
+//        startActivityForResult(intent, SCAN_QR_CODE)
+    }
+
     private fun goSetting() {
         val intent = Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -277,12 +275,18 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
+    @Subscribe
+    @Suppress("unused")
+    fun onDetected(result: DetectEvent) {
+        result.auth.let {
+            mainViewModel.addData(it)
+        }
+    }
+
     companion object {
         private const val TAG = "MainActivity"
 
         private const val CAMERA_REQUEST_CODE = 1
-
-        private const val SCAN_QR_CODE = 2
     }
 }
 

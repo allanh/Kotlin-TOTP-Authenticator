@@ -24,6 +24,8 @@
               android:label="fragment_main" tools:layout="@layout/fragment_main">
         <action android:id="@+id/action_mainFragment_to_pinsFragment" app:destination="@id/pinsFragment" app:popUpToInclusive="true"/>
         <action android:id="@+id/action_mainFragment_to_sendCodeFragment" app:destination="@id/sendCodeFragment"/>
+        <action android:id="@+id/action_mainFragment_to_scanFragment" app:destination="@id/scanFragment"/>
+        <action android:id="@+id/action_mainFragment_to_GVScanFragment" app:destination="@id/gvScanFragment"/>
     </fragment>
     <fragment android:id="@+id/pinsFragment" android:name="com.udnshopping.udnsauthorizer.view.pins.PinsFragment"
               android:label="PinsFragment">
@@ -33,8 +35,8 @@
               android:label="fragment_config" tools:layout="@layout/fragment_config"/>
     <fragment android:id="@+id/sendCodeFragment" android:name="com.udnshopping.udnsauthorizer.view.sendcode.SendCodeFragment"
               android:label="SendCodeFragment"/>
-    <fragment android:id="@+id/loadingFragment" android:name="com.udnshopping.udnsauthorizer.view.LoadingFragment"
-              android:label="LoadingFragment">
-        <action android:id="@+id/action_loadingFragment_to_mainFragment" app:destination="@id/mainFragment"/>
-    </fragment>
+    <fragment android:id="@+id/scanFragment" android:name="com.udnshopping.udnsauthorizer.view.scan.ScanFragment"
+              android:label="ScanFragment"/>
+    <fragment android:id="@+id/gvScanFragment" android:name="com.udnshopping.udnsauthorizer.view.scan.GVScanFragment"
+              android:label="fragment_gv_scan" tools:layout="@layout/fragment_gv_scan"/>
 </navigation>
