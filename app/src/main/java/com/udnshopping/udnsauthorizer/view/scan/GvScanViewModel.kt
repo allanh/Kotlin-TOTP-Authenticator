@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.udnshopping.udnsauthorizer.utility.ULog
 import javax.inject.Inject
 
-class ScanViewModel @Inject
+class GvScanViewModel @Inject
 constructor(private var surfaceHolderCallback: SurfaceHolderCallback) : ViewModel() {
     private var surfaceHolder: SurfaceHolder? = null
     /**
@@ -18,6 +18,6 @@ constructor(private var surfaceHolderCallback: SurfaceHolderCallback) : ViewMode
     }
 
     companion object {
-        private const val TAG = "ScanViewModel"
+        private const val TAG = "GvScanViewModel"
     }
 }

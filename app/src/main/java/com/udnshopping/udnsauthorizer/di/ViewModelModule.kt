@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.udnshopping.udnsauthorizer.utility.AppViewModelFactory
 import com.udnshopping.udnsauthorizer.view.MainActivityViewModel
 import com.udnshopping.udnsauthorizer.view.pins.PinsViewModel
-import com.udnshopping.udnsauthorizer.view.scan.ScanViewModel
 import com.udnshopping.udnsauthorizer.view.sendcode.SendCodeViewModel
 import dagger.Binds
 import dagger.Module

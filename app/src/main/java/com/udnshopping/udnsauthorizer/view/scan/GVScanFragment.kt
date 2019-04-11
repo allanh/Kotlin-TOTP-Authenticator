@@ -7,18 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.udnshopping.udnsauthorizer.R
-import com.udnshopping.udnsauthorizer.model.DetectEvent
-import com.udnshopping.udnsauthorizer.utility.ULog
 import dagger.android.support.AndroidSupportInjection
-import kotlinx.android.synthetic.main.content_scan.*
 import kotlinx.android.synthetic.main.content_scan.view.*
-import kotlinx.android.synthetic.main.fragment_gv_scan.*
 import kotlinx.android.synthetic.main.fragment_gv_scan.view.*
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
 
 
@@ -27,7 +20,7 @@ import javax.inject.Inject
  */
 class GVScanFragment : Fragment() {
     @Inject
-    lateinit var viewModel: ScanViewModel
+    lateinit var viewModel: GvScanViewModel
     var box: Box? = null
     var isDetected = false
 

@@ -1,5 +1,6 @@
 package com.udnshopping.udnsauthorizer.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import androidx.core.content.ContextCompat
@@ -36,6 +37,7 @@ class SecretAdapter(private var items: List<Pin>?, private val context: Context)
     }
 
     // Binds each animal in the ArrayList to a view
+    @SuppressLint("SetTextI18n")
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         items?.let {
             // Key

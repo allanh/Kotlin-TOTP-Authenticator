@@ -121,7 +121,6 @@ class MainActivity : DaggerAppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
-            //goConfig()
             findNavController(R.id.nav_host_fragment).navigate(R.id.configFragment)
             true
         }
@@ -186,6 +185,15 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
+    fun scan() {
+        findNavController(R.id.nav_host_fragment).navigate(
+            if (resources.getBoolean(R.bool.isTablet))
+                R.id.scanFragment
+            else
+                R.id.gvScanFragment
+        )
+    }
+
     private fun showPermissionDialog() {
         val builder = AlertDialog.Builder(this)
             .setTitle(R.string.permission_dialog_title)
@@ -237,14 +245,6 @@ class MainActivity : DaggerAppCompatActivity() {
             e.printStackTrace()
         }
         return "1.0.0"
-    }
-
-    fun scan() {
-//        findNavController(R.id.nav_host_fragment).navigate(R.id.scanFragment)
-        findNavController(R.id.nav_host_fragment).navigate(R.id.gvScanFragment)
-
-//        val intent = Intent(this, GVScanFragment::class.java)
-//        startActivityForResult(intent, SCAN_QR_CODE)
     }
 
     private fun goSetting() {

@@ -12,8 +12,8 @@ import org.greenrobot.eventbus.EventBus
 class GVScanFragmentModule {
 
     @Provides
-    fun provideScanViewModel(surfaceHolderCallback: SurfaceHolderCallback): ScanViewModel {
-        return ScanViewModel(surfaceHolderCallback)
+    fun provideScanViewModel(surfaceHolderCallback: SurfaceHolderCallback): GvScanViewModel {
+        return GvScanViewModel(surfaceHolderCallback)
     }
 
     @Provides
