@@ -58,16 +58,16 @@ dependencies {
     // kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.anko:anko:$ankoVersion"
-    implementation 'com.marcelkliemannel:kotlin-onetimepassword:1.0.0'
+    implementation "com.marcelkliemannel:kotlin-onetimepassword:$onetimepasswordVersion"
 
     // architecture components
-    implementation "android.arch.navigation:navigation-fragment-ktx:1.0.0"
-    implementation "android.arch.navigation:navigation-ui-ktx:1.0.0"
-    implementation "android.arch.work:work-runtime-ktx:1.0.1-rc01"
-    implementation "androidx.core:core-ktx:1.0.1"
+    implementation "android.arch.navigation:navigation-fragment-ktx:$navigationVersion"
+    implementation "android.arch.navigation:navigation-ui-ktx:$navigationVersion"
+    implementation "android.arch.work:work-runtime-ktx:$workVersion"
+    implementation "androidx.core:core-ktx:$coreKtxVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$archCompomentVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
-    implementation 'org.greenrobot:eventbus:3.1.1'
+    implementation "org.greenrobot:eventbus:$eventbusVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     testImplementation "androidx.arch.core:core-testing:$archCompomentVersion"
 
@@ -89,11 +89,11 @@ dependencies {
     testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
 
     // Firebase
-    implementation 'com.google.android.gms:play-services-vision:17.0.2'
-    implementation 'com.google.firebase:firebase-core:16.0.8'
-    implementation 'com.google.firebase:firebase-config:16.5.0'
-//    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
-    implementation 'com.budiyev.android:code-scanner:2.1.0'
+    implementation "com.google.android.gms:play-services-vision:$visionVersion"
+    implementation "com.google.firebase:firebase-core:$firebaseCoreVersion"
+    implementation "com.google.firebase:firebase-config:$firebaseConfigVersion"
+//    implementation "com.crashlytics.sdk.android:crashlytics:$crashlyticsVersion'
+    implementation "com.budiyev.android:code-scanner:$codeScannerVersion"
 
     //Moshi
     implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
@@ -106,10 +106,10 @@ dependencies {
     // unit test
     testImplementation "junit:junit:$junitVersion"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
-    androidTestImplementation 'androidx.test:runner:1.2.0-alpha3'
+    androidTestImplementation "androidx.test:runner:$testVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-    androidTestImplementation "androidx.test.ext:junit:1.1.0"
-    androidTestImplementation "androidx.test:rules:1.2.0-alpha03"
+    androidTestImplementation "androidx.test.ext:junit:$junitVersion"
+    androidTestImplementation "androidx.test:rules:$testVersion"
 }
 
 apply plugin: 'com.google.gms.google-services'
