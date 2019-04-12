@@ -10,10 +10,14 @@ import androidx.navigation.fragment.findNavController
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
+import com.budiyev.android.codescanner.ErrorCallback
+import com.google.android.material.snackbar.Snackbar
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.model.DetectEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
+import com.udnshopping.udnsauthorizer.view.MainActivity
 import org.greenrobot.eventbus.EventBus
+import org.jetbrains.anko.support.v4.longToast
 
 class ScanFragment : Fragment() {
 
@@ -33,6 +37,15 @@ class ScanFragment : Fragment() {
             ULog.d(TAG, "decode: " + it.text)
             EventBus.getDefault().post(DetectEvent(it.text))
             findNavController().navigateUp()
+        }
+
+        codeScanner?.errorCallback = ErrorCallback { error ->
+            error.printStackTrace()
+            activity?.runOnUiThread {
+                (activity as MainActivity)
+                    .showErrorDialog(error.message ?: getString(R.string.camera_error))
+                    { findNavController().navigateUp() }
+            }
         }
     }
 

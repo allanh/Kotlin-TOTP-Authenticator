@@ -16,6 +16,7 @@
     <string name="cancel">取消</string>
     <string name="update">更新</string>
     <string name="setting">設定</string>
+    <string name="error">錯誤</string>
     <string name="qrcode_error">無效的 QR 碼</string>
     <string name="pins_hint">
         1. 點擊右上角的相機圖案，進入手掃描畫面。\n\n
@@ -29,4 +30,6 @@
     <string name="update_dialog_title">通知</string>
     <string name="update_dialog_content">您好，新版本已經發佈，請更新後再使用，謝謝。</string>
     <string name="update_url">https://play.google.com/store/apps/details?id=com.udnshopping.udnsauthorizer</string>
+
+    <string name="camera_error">Unable to access camera.</string>
 </resources>

@@ -237,6 +237,17 @@ class MainActivity : DaggerAppCompatActivity() {
         builder.show()
     }
 
+    fun showErrorDialog(message: String, func: () -> Unit) {
+        val builder = AlertDialog.Builder(this)
+            .setTitle(R.string.error)
+            .setMessage(message)
+            .setCancelable(false)
+            .setNegativeButton(R.string.ok) { _, _ ->
+                func()
+            }
+        builder.show()
+    }
+
     private fun getVersion(): String {
         try {
             val pInfo = packageManager?.getPackageInfo(packageName, 0)
