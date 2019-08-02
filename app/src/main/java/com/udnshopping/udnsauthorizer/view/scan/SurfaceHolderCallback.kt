@@ -5,6 +5,7 @@ import android.view.SurfaceHolder
 import com.google.android.gms.vision.CameraSource
 import com.udnshopping.udnsauthorizer.utility.ULog
 import java.io.IOException
+import java.lang.RuntimeException
 import javax.inject.Inject
 
 class SurfaceHolderCallback @Inject constructor(private val cameraSource: CameraSource) : SurfaceHolder.Callback {
@@ -12,6 +13,8 @@ class SurfaceHolderCallback @Inject constructor(private val cameraSource: Camera
     override fun surfaceCreated(holder: SurfaceHolder) {
         try {
             cameraSource.start(holder)
+        } catch (rx: RuntimeException) {
+            rx.printStackTrace()
         } catch (ex: IOException) {
             ex.printStackTrace()
         }

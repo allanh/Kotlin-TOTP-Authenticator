@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.text.TextUtils
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
@@ -26,6 +25,9 @@ import com.udnshopping.udnsauthorizer.model.DetectEvent
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
 import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
@@ -141,9 +143,12 @@ class MainActivity : DaggerAppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_REQUEST_CODE) {
 
-            if (grantResults.isNotEmpty() && grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                scan()
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                ULog.d(TAG, "get permission")
+                GlobalScope.launch {
+                    delay(500)
+                    scan()
+                }
             } else {
                 if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
                         android.Manifest.permission.CAMERA)) {
@@ -186,6 +191,7 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     fun scan() {
+        ULog.d(TAG, "scan")
         findNavController(R.id.nav_host_fragment).navigate(
             if (resources.getBoolean(R.bool.isTablet))
                 R.id.scanFragment

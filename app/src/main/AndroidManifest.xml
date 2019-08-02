@@ -24,10 +24,5 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-                android:name=".view.scan.GVScanFragment"
-                android:label="@string/title_activity_scan"
-                android:theme="@style/AppTheme.NoActionBar">
-        </activity>
     </application>
 </manifest>
