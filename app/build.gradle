@@ -11,10 +11,12 @@ android {
         applicationId "com.udnshopping.udnsauthorizer"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 32
-        versionName "1.0.9.d17b60"
+        versionCode 34
+        versionName "1.0.11"
         vectorDrawables.useSupportLibrary true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        resValue "string", "app_name", "udn SPM OTP"
     }
     kapt {
         correctErrorTypes = true
@@ -23,6 +25,17 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        applicationVariants.all { variant ->
+            variant.outputs.all { output ->
+                def buildName = "udnsauthorizer"
+                def type = variant.buildType.name
+                if (variant.buildType.name == 'debug') {
+                    outputFileName = buildName + '-' + type + '.apk'
+                } else {
+                    outputFileName = buildName + '-' + type + "-" + versionName + '.apk'
+                }
+            }
         }
     }
     dataBinding.enabled true
