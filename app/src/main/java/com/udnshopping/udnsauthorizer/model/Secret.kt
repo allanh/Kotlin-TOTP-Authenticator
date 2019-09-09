@@ -6,6 +6,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Secret(
+    var startTime: Long = 0L,
     @SerializedName("secret") private val _key: String?,
     @SerializedName("user") private val _value: String?,
     @SerializedName("date") private val _date: String?

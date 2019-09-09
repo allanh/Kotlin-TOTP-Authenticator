@@ -78,7 +78,7 @@ class PinsFragment : Fragment() {
         pinsRecyclerView.adapter = SecretAdapter(pins, fragmentContext)
 
         val swipeHandler = object : SwipeToDeleteCallback(fragmentContext) {
-            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 ULog.d(TAG, "swiped")
                 viewModel.removeAt(viewHolder.adapterPosition)
             }
