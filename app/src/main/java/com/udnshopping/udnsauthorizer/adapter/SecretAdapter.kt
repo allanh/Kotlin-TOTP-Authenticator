@@ -12,12 +12,9 @@ import android.widget.TextView
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.extension.setProgressTintColor
 import com.udnshopping.udnsauthorizer.model.Pin
-import com.udnshopping.udnsauthorizer.repository.SecretRepository
 
 class SecretAdapter(private var items: List<Pin>?, private val context: Context) :
     androidx.recyclerview.widget.RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
-
-    private val updateTime: Long get() = SecretRepository.UPDATE_TIME
 
     class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tvSecretType: TextView = view.findViewById(R.id.tv_secret_type)
@@ -53,8 +50,9 @@ class SecretAdapter(private var items: List<Pin>?, private val context: Context)
             viewHolder.tvDate.text = it[position].date
 
             // Progress
-            val progress = (updateTime - it[position].progress) * 100 / updateTime
-            viewHolder.progressBar.progress = progress.toInt()
+            val progress = (60 - (it[position].progress % 60)) * 100 / 60
+            //ULog.d("adapter", "progress: $progress")
+            viewHolder.progressBar.progress = progress
 
             // Set color
             val isValid: Boolean = it[position].isValid

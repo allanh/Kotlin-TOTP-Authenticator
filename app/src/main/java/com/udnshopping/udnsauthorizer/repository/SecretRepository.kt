@@ -3,6 +3,7 @@ package com.udnshopping.udnsauthorizer.repository
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -24,7 +25,7 @@ import javax.inject.Singleton
 
 @Singleton
 class SecretRepository @Inject
-constructor(context: Context, private val preferences: SharedPreferences) {
+constructor(private val context: Context, private val preferences: SharedPreferences) {
 
     /**
      * This is the job for all coroutines started by this repository.
@@ -102,14 +103,14 @@ constructor(context: Context, private val preferences: SharedPreferences) {
      */
     fun addData(auth: String) {
         var secret: Secret? = null
-        val authLength = auth.length
+        val authLength = auth.length ?: 0
 
         ULog.d(TAG, "add Data: $auth")
-        if (authLength > 2 && !auth.startsWith(AUTH_PREFIX)) {
+        if (authLength > 2 && !auth.startsWith("otpauth://totp")) {
             val decryptString = auth.substring(2)
             try {
                 val json = ThreeDESUtil.decrypt(decryptString)
-                if (json.isNotEmpty() && json.contains("acc", ignoreCase = false)) {
+                if (!json.isEmpty() && json.contains("acc", ignoreCase = false)) {
                     val type = object : TypeToken<Map<String, String>>() {}.type
                     val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
                     ULog.d(TAG, "secretInfo: ${secretInfo?.toString()}")
@@ -119,7 +120,7 @@ constructor(context: Context, private val preferences: SharedPreferences) {
                         val time = secretInfo[KEY_TIME]
                         val date = originDataFormat.parse(time)
                         val dateString = pinDateFormat.format(date)
-                        secret = Secret(Date().time, secretInfo[KEY_SECRET], secretInfo[KEY_ACCOUNT], dateString)
+                        secret = Secret(secretInfo[KEY_SECRET], secretInfo[KEY_ACCOUNT], dateString)
                     }
                 } else {
                     showQRCodeErrorEvent.call()
@@ -133,7 +134,7 @@ constructor(context: Context, private val preferences: SharedPreferences) {
             val secretKey = uri.getQueryParameter(KEY_SECRET)
             val user = uri.path
             if (!secretKey.isNullOrEmpty() && !user.isNullOrEmpty()) {
-                secret = Secret(Date().time, secretKey, user, "")
+                secret = Secret(secretKey, user, "")
             }
         } else {
             showQRCodeErrorEvent.call()
@@ -158,7 +159,7 @@ constructor(context: Context, private val preferences: SharedPreferences) {
 
         val config = TimeBasedOneTimePasswordConfig(
             codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
-            timeStep = UPDATE_TIME, timeStepUnit = TimeUnit.SECONDS
+            timeStep = 60, timeStepUnit = TimeUnit.SECONDS
         )
         for (secret in secrets) {
             if (secret.key.isNotEmpty() && secret.value.isNotEmpty()) {
@@ -166,9 +167,10 @@ constructor(context: Context, private val preferences: SharedPreferences) {
                 val timeBasedOneTimePasswordGenerator =
                     TimeBasedOneTimePasswordGenerator(key, config)
                 val pinString = timeBasedOneTimePasswordGenerator.generate()
-                val diffTime = Date().time - secret.startTime
-                val progress = TimeUnit.MILLISECONDS.toSeconds(diffTime) % UPDATE_TIME
-                val pin = Pin(pinString, secret.value, progress.toInt(), secret.date)
+                val progress = SimpleDateFormat("ss", LocaleUtil.getCurrent(context))
+                    .format(Calendar.getInstance().time)
+                    .toInt()
+                val pin = Pin(pinString, secret.value, progress, secret.date)
                 pinList.add(pin)
 
                 // Update the last time map
@@ -227,7 +229,7 @@ constructor(context: Context, private val preferences: SharedPreferences) {
         private const val KEY_SECRET_LIST = "secretList"
         private const val KEY_ACCOUNT = "acc"
         private const val KEY_TIME = "time"
-        const val UPDATE_TIME = 120L
-        const val AUTH_PREFIX = "otpauth://totp"
+
+        const val KEY_AUTH = "auth"
     }
 }
