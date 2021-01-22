@@ -1,5 +1,6 @@
 
 # Built application files
+.cxx/
 *.apk
 *.ap_
 *.aab
@@ -51,12 +52,10 @@ captures/
 # Google Services (e.g. APIs or Firebase)
 #google-services.json
 
-# Freeline
+# Freelane
 freeline.py
 freeline/
 freeline_project_description.json
-
-# fastlane
 fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots
