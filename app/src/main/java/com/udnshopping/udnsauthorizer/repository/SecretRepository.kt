@@ -100,6 +100,7 @@ constructor(private val context: Context, private val preferences: SharedPrefere
 
     /**
      * Add an [auth] data to secrets.
+     *
      */
     fun addData(auth: String) {
         var secret: Secret? = null
