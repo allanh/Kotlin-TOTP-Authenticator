@@ -193,10 +193,12 @@ class MainActivity : DaggerAppCompatActivity() {
     fun scan() {
         ULog.d(TAG, "scan")
         findNavController(R.id.nav_host_fragment).navigate(
-            if (resources.getBoolean(R.bool.isTablet))
-                R.id.scanFragment
-            else
-                R.id.gvScanFragment
+            R.id.scanFragment
+            // Disable the Google Vision Barcode Scanner
+//            if (resources.getBoolean(R.bool.isTablet))
+//                R.id.scanFragment
+//            else
+//                R.id.gvScanFragment
         )
     }
 

@@ -20,44 +20,21 @@ constructor(private val remoteConfig: FirebaseRemoteConfig) {
 
     init {
         ULog.d(TAG, "Injection RemoteConfigRepository")
-        initRemoteConfig()
-    }
-
-    /**
-     * Get Remote Config instance and Set default Remote Config parameter values.
-     */
-    private fun initRemoteConfig() {
-        val configSettings = FirebaseRemoteConfigSettings.Builder()
-            .setDeveloperModeEnabled(BuildConfig.DEBUG)
-            .build()
-        remoteConfig.setConfigSettings(configSettings)
-        remoteConfig.setDefaults(R.xml.remote_config_default)
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_default)
     }
 
     /**
      * Fetch a email input config from the Remote Config service.
      */
     fun fetchRemoteConfig() {
-        val isUsingDeveloperMode = remoteConfig.info.configSettings.isDeveloperModeEnabled
-
-        // If your app is using developer mode, cacheExpiration is set to 0, so each fetch will
-        // retrieve values from the service.
-        val cacheExpiration: Long = if (isUsingDeveloperMode) {
-            0
-        } else {
-            3600 // 1 hour in seconds.
-        }
 
         // cacheExpirationSeconds is set to cacheExpiration here, indicating the next fetch request
         // will use fetch data from the Remote Config service, rather than cached parameter values,
         // if cached parameter values are more than cacheExpiration seconds old.
-        remoteConfig.fetch(cacheExpiration)
+        remoteConfig.fetchAndActivate()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     ULog.d(TAG, "Fetch successful")
-                    // After config data is successfully fetched, it must be activated before newly fetched
-                    // values are returned.
-                    remoteConfig.activateFetched()
 
                     val forceUpdateVersion = remoteConfig.getString(FORCE_UPDATE_VERSION_KEY)
                     val isEmailInput = remoteConfig.getBoolean(EMAIL_INPUT_KEY)
