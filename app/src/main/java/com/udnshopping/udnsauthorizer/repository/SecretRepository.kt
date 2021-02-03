@@ -3,7 +3,6 @@ package com.udnshopping.udnsauthorizer.repository
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -20,12 +19,13 @@ import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SecretRepository @Inject
-constructor(private val context: Context, private val preferences: SharedPreferences) {
+@Suppress("unused")
+class SecretRepository constructor(
+    private val context: Context,
+    private val desUtil: ThreeDESUtil,
+    private val preferences: SharedPreferences
+) {
 
     /**
      * This is the job for all coroutines started by this repository.
@@ -44,7 +44,7 @@ constructor(private val context: Context, private val preferences: SharedPrefere
 
     private val originDataFormat = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", LocaleUtil.getCurrent(context))
     private val pinDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", LocaleUtil.getCurrent(context))
-    
+
     private var secrets: MutableList<Secret> = mutableListOf()
     private val showQRCodeErrorEvent = SingleLiveEvent<Any>()
     private var pins = MutableLiveData<MutableList<Pin>>()
@@ -89,8 +89,8 @@ constructor(private val context: Context, private val preferences: SharedPrefere
         val tempPins = pinList.toMutableList()
         for (pin in tempPins) {
             if (pin.date.isNotEmpty()) {
-                val pinTime = pinDateFormat.parse(pin.date).time
-                pin.isValid = (pinTime == lastTimeMap[pin.value])
+                val pinTime = pinDateFormat.parse(pin.date)?.time
+                pin.isValid = (pinTime == lastTimeMap[pin.user])
             } else {
                 pin.isValid = true
             }
@@ -102,27 +102,21 @@ constructor(private val context: Context, private val preferences: SharedPrefere
      * Add an [auth] data to secrets.
      *
      */
-    fun addData(auth: String) {
+    fun addData(auth: String?) {
+        auth ?: return
         var secret: Secret? = null
-        val authLength = auth.length ?: 0
+        val authLength = auth.length
 
         ULog.d(TAG, "add Data: $auth")
         if (authLength > 2 && !auth.startsWith("otpauth://totp")) {
             val decryptString = auth.substring(2)
             try {
-                val json = ThreeDESUtil.decrypt(decryptString)
-                if (!json.isEmpty() && json.contains("acc", ignoreCase = false)) {
+                val json = desUtil.decrypt(decryptString)
+                if (json.isNotEmpty() && json.contains("acc", ignoreCase = false)) {
                     val type = object : TypeToken<Map<String, String>>() {}.type
-                    val secretInfo = Gson().fromJson<Map<String, String>>(json, type)
-                    ULog.d(TAG, "secretInfo: ${secretInfo?.toString()}")
-
-                    // Change the data format
-                    if (!(secretInfo == null || secretInfo.isEmpty())) {
-                        val time = secretInfo[KEY_TIME]
-                        val date = originDataFormat.parse(time)
-                        val dateString = pinDateFormat.format(date)
-                        secret = Secret(secretInfo[KEY_SECRET], secretInfo[KEY_ACCOUNT], dateString)
-                    }
+                    val infoMap = Gson().fromJson<Map<String, String>>(json, type)
+                    ULog.d(TAG, "secretInfo: ${infoMap?.toString()}")
+                    secret = createSecret(infoMap)
                 } else {
                     showQRCodeErrorEvent.call()
                 }
@@ -150,6 +144,20 @@ constructor(private val context: Context, private val preferences: SharedPrefere
         }
     }
 
+    /**
+     * Create a Secret object.
+     */
+    private fun createSecret(map: Map<String, String>): Secret? {
+        var secret: Secret? = null
+        // Change the data format
+        if (map.isNotEmpty()) {
+            val time = map[KEY_TIME] ?: return null
+            val date = originDataFormat.parse(time) ?: return null
+            val dateString = pinDateFormat.format(date)
+            secret = Secret(map[KEY_SECRET], map[KEY_ACCOUNT], dateString)
+        }
+        return secret
+    }
 
     /**
      * Update the pin list.
@@ -158,43 +166,41 @@ constructor(private val context: Context, private val preferences: SharedPrefere
         val pinList = mutableListOf<Pin>()
         val lastTimeMap = mutableMapOf<String, Long>()
 
-        val config = TimeBasedOneTimePasswordConfig(
-            codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
-            timeStep = 60, timeStepUnit = TimeUnit.SECONDS
-        )
         for (secret in secrets) {
             if (secret.key.isNotEmpty() && secret.value.isNotEmpty()) {
                 val key = secret.key.toByteArray()
                 val timeBasedOneTimePasswordGenerator =
-                    TimeBasedOneTimePasswordGenerator(key, config)
+                        TimeBasedOneTimePasswordGenerator(key, config)
                 val pinString = timeBasedOneTimePasswordGenerator.generate()
                 val progress = SimpleDateFormat("ss", LocaleUtil.getCurrent(context))
-                    .format(Calendar.getInstance().time)
-                    .toInt()
+                        .format(Calendar.getInstance().time)
+                        .toInt()
                 val pin = Pin(pinString, secret.value, progress, secret.date)
                 pinList.add(pin)
 
                 // Update the last time map
                 if (secret.date.isNotEmpty()) {
-                    val pinTimeStamp = pinDateFormat.parse(secret.date).time
-                    if (lastTimeMap.containsKey(secret.value)) {
-                        lastTimeMap[secret.value]?.let {
-                            if (it < pinTimeStamp)
-                                lastTimeMap[secret.value] = pinTimeStamp
+                    pinDateFormat.parse(secret.date)?.time?.let { pinTimeStamp ->
+                        if (lastTimeMap.containsKey(secret.value)) {
+                            lastTimeMap[secret.value]?.let {
+                                if (it < pinTimeStamp)
+                                    lastTimeMap[secret.value] = pinTimeStamp
+                            }
+                        } else {
+                            lastTimeMap[secret.value] = pinTimeStamp
                         }
-                    } else {
-                        lastTimeMap[secret.value] = pinTimeStamp
                     }
                 }
             }
         }
         updatePinListState(lastTimeMap, pinList)
     }
-    
+
     /**
      * Removes an element at the specified [position] from the secret and pin list.
      */
-    @Synchronized fun removeAt(position: Int) {
+    @Synchronized
+    fun removeAt(position: Int) {
         ULog.d(TAG, "removeAt: $position")
         if (position >= 0 && position < secrets.size) {
             secrets.removeAt(position)
@@ -202,7 +208,7 @@ constructor(private val context: Context, private val preferences: SharedPrefere
 
             val tempPins = pins.value?.toMutableList()
             tempPins?.removeAt(position)
-            pins.value = tempPins
+            pins.postValue(tempPins)
             ULog.d(TAG, "removed pin list size: ${pins.value?.size}")
         }
     }
@@ -230,6 +236,10 @@ constructor(private val context: Context, private val preferences: SharedPrefere
         private const val KEY_SECRET_LIST = "secretList"
         private const val KEY_ACCOUNT = "acc"
         private const val KEY_TIME = "time"
+        private val config = TimeBasedOneTimePasswordConfig(
+                codeDigits = 6, hmacAlgorithm = HmacAlgorithm.SHA1,
+                timeStep = 60, timeStepUnit = TimeUnit.SECONDS
+        )
 
         const val KEY_AUTH = "auth"
     }

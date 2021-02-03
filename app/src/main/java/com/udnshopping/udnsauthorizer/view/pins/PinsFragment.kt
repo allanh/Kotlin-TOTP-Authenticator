@@ -5,47 +5,48 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.udnshopping.udnsauthorizer.model.Pin
 import com.udnshopping.udnsauthorizer.utility.ULog
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.udnshopping.udnsauthorizer.R
+import com.udnshopping.udnsauthorizer.adapter.PinAdapter
 import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback
 import com.udnshopping.udnsauthorizer.adapter.SecretAdapter
+import com.udnshopping.udnsauthorizer.callback.SwipeToDeleteCallback2
 import com.udnshopping.udnsauthorizer.databinding.FragmentPinsBinding
 import com.udnshopping.udnsauthorizer.view.MainActivity
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PinsFragment : Fragment() {
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: PinsViewModel
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(PinsViewModel::class.java)
-    }
+    private val pinsViewModel: PinsViewModel by viewModel()
+    private lateinit var binding: FragmentPinsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         ULog.d(TAG, "onCreate")
-        val binding = DataBindingUtil.inflate<FragmentPinsBinding>(inflater,
-            R.layout.fragment_pins, container, false)
-        viewModel.getPinsObservable().observe(this, Observer {
-            (binding.pinsRecyclerView.adapter as SecretAdapter).updateData(it)
-        })
-        binding.viewModel = viewModel
+        binding = FragmentPinsBinding.inflate(inflater, container, false)
+        binding.viewModel = pinsViewModel
         binding.lifecycleOwner = this
-
         //ULog.d(TAG, "setListView: ${it.size}")
-        setListView(binding.pinsRecyclerView, viewModel.getPinsObservable().value)
+//        setListView(binding.pinsRecyclerView, pinsViewModel.getPinsObservable().value)
 
+        val adapter = PinAdapter()
+        binding.pinsRecyclerView.adapter = adapter
+
+        val swipeToDeleteCallback = object : SwipeToDeleteCallback2(binding.root.context) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val pos = viewHolder.adapterPosition
+                pinsViewModel.removeAt(pos)
+                binding.pinsRecyclerView.adapter?.notifyDataSetChanged()
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(binding.pinsRecyclerView)
+
+        subscribeUI(adapter)
         ULog.d(TAG, "onCreate done")
         return binding.root
     }
@@ -73,29 +74,49 @@ class PinsFragment : Fragment() {
         val fragmentContext = context as Context
 
         // Creates a vertical Layout Manager
-        pinsRecyclerView.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(activity)
+        pinsRecyclerView.layoutManager = LinearLayoutManager(activity)
         // Access the RecyclerView Adapter and load the data into it
         pinsRecyclerView.adapter = SecretAdapter(pins, fragmentContext)
 
-        val swipeHandler = object : SwipeToDeleteCallback(fragmentContext) {
-            override fun onSwiped(viewHolder: androidx.recyclerview.widget.RecyclerView.ViewHolder, direction: Int) {
-                ULog.d(TAG, "swiped")
-                viewModel.removeAt(viewHolder.adapterPosition)
+//        val swipeHandler = object : SwipeToDeleteCallback(fragmentContext) {
+//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//                ULog.d(TAG, "swiped")
+//                pinsViewModel.removeAt(viewHolder.adapterPosition)
+//            }
+//        }
+//        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+//        itemTouchHelper.attachToRecyclerView(pinsRecyclerView)
+
+
+        val swipeToDeleteCallback = object : SwipeToDeleteCallback2(fragmentContext) {
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val pos = viewHolder.adapterPosition
+                pinsViewModel.removeAt(pos)
+                binding.pinsRecyclerView.adapter?.notifyDataSetChanged()
             }
         }
-        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(pinsRecyclerView)
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.enableRefresh(true)
+        pinsViewModel.enableRefresh(true)
         (activity as AppCompatActivity).supportActionBar?.show()
     }
 
     override fun onPause() {
-        viewModel.enableRefresh(false)
+        pinsViewModel.enableRefresh(false)
         super.onPause()
+    }
+
+    private fun subscribeUI(adapter: PinAdapter) {
+        pinsViewModel.getPinsObservable().observe(viewLifecycleOwner, {
+            adapter.submitList(it)
+//            binding.pinsRecyclerView.adapter = PinAdapter(it)
+//            (binding.pinsRecyclerView.adapter as SecretAdapter).updateData(it)
+        })
     }
 
     companion object {

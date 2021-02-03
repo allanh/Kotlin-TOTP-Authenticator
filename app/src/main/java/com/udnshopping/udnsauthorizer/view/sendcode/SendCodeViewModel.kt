@@ -2,10 +2,8 @@ package com.udnshopping.udnsauthorizer.view.sendcode
 
 import androidx.lifecycle.ViewModel
 import com.udnshopping.udnsauthorizer.repository.QRCodeRepository
-import javax.inject.Inject
 
-class SendCodeViewModel @Inject
-constructor(private val repository: QRCodeRepository) : ViewModel() {
+class SendCodeViewModel(private val repository: QRCodeRepository) : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()

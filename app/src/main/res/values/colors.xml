@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF7F00</color>
     <color name="textColorPrimary">#565656</color>
     <color name="holo_orange_dark">#ffff8800</color>
+    <color name="disable">#565656</color>
 </resources>

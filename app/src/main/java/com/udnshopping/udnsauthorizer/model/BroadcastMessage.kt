@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class BroadcastMessage (
-    val date: String,
-    val title: String,
-    val body: String
+    val date: String? = null,
+    val title: String? = null,
+    val body: String? = null
 ) : Parcelable

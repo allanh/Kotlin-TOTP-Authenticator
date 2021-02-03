@@ -6,9 +6,9 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Secret(
-    @SerializedName("secret") private val _key: String?,
-    @SerializedName("user") private val _value: String?,
-    @SerializedName("date") private val _date: String?
+    @SerializedName("secret") private val _key: String? = null,
+    @SerializedName("user") private val _value: String? = null,
+    @SerializedName("date") private val _date: String? = null
 ) : Parcelable {
     val key: String
         get() = _key ?: ""

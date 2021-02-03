@@ -8,46 +8,33 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.FragmentSendCodeBinding
 import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
-import dagger.android.support.AndroidSupportInjection
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SendCodeFragment : Fragment() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    private lateinit var viewModel: SendCodeViewModel
+    private val viewModel: SendCodeViewModel by viewModel()
     private lateinit var binding: FragmentSendCodeBinding
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-        viewModel = ViewModelProviders.of(this, viewModelFactory).get(SendCodeViewModel::class.java)
-        viewModel.getResultObservable().observe(this, Observer {
-            ULog.d(TAG, "result: $it")
-            activity?.onBackPressed()
-        })
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         ULog.d(TAG, "onCreate")
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_send_code, container, false)
+        binding = FragmentSendCodeBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
-        EventBus.getDefault().register(this)
+        binding.lifecycleOwner = this
+
+        viewModel.getResultObservable().observe(viewLifecycleOwner, Observer {
+            ULog.d(TAG, "result: $it")
+            activity?.onBackPressed()
+        })
+
         ULog.d(TAG, "onCreate done")
         return binding.root
     }
@@ -63,8 +50,6 @@ class SendCodeFragment : Fragment() {
     /**
      * Called by eventBus when an event occurs
      */
-    @Subscribe
-    @Suppress("unused")
     fun onKeyEvent(event: KeyUpEvent) {
         when (event.keyCode) {
             KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> {
@@ -75,11 +60,6 @@ class SendCodeFragment : Fragment() {
             }
             else -> {}
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        EventBus.getDefault().unregister(this)
     }
 
     private fun openSoftKeyboard(context: Context, view: View) {

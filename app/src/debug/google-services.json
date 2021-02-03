@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "676422791944",
+    "firebase_url": "https://udn-spm-otp.firebaseio.com",
+    "project_id": "udn-spm-otp",
+    "storage_bucket": "udn-spm-otp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676422791944:android:9bbf962f2e254388",
+        "android_client_info": {
+          "package_name": "com.udnshopping.udnsauthorizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "676422791944-7qqeu6tui3qsqpp8nurn3vimpmf8nf2h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWfgQ67pXWjV5lmmWNYnsfZNV-l5YKpB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "676422791944-7qqeu6tui3qsqpp8nurn3vimpmf8nf2h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "676422791944-0k9svqsrm3qb4uksnju198lmk8mr6nei.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.udnshopping.authenticator"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676422791944:android:69f67f19da200a9f3072bd",
+        "android_client_info": {
+          "package_name": "com.udnshopping.udnsauthorizer.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "676422791944-7qqeu6tui3qsqpp8nurn3vimpmf8nf2h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDWfgQ67pXWjV5lmmWNYnsfZNV-l5YKpB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "676422791944-7qqeu6tui3qsqpp8nurn3vimpmf8nf2h.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "676422791944-0k9svqsrm3qb4uksnju198lmk8mr6nei.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.udnshopping.authenticator"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

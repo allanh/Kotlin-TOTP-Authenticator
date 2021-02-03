@@ -11,14 +11,13 @@ import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.lang.Exception
 import java.net.URL
-import javax.inject.Inject
 import javax.net.ssl.HttpsURLConnection
 
 /**
  * QRCodeRepository provides an interface to send an email to TOTP server.
  */
 @Suppress("unused")
-class QRCodeRepository @Inject constructor(private val context: Context) {
+class QRCodeRepository constructor(private val context: Context) {
 
     /**
      * This is the job for all coroutines started by this repository.
@@ -39,7 +38,7 @@ class QRCodeRepository @Inject constructor(private val context: Context) {
 
     private fun sendEmailToTOTP(email: String): String? {
         var result: String? = null
-        val url = URL("$TOTP_API$email")
+        val url = URL("${getTotpApi()}$email")
         val urlConnection = url.openConnection() as HttpsURLConnection
 
         try {
@@ -64,7 +63,7 @@ class QRCodeRepository @Inject constructor(private val context: Context) {
             inputStream.close()
         } catch (exception: Exception) {
             ULog.d(TAG, "error message: ${exception.message}")
-            result = exception.localizedMessage.toString()
+            result = exception.localizedMessage?.toString()
         } finally {
             urlConnection.disconnect()
             ULog.d(TAG, "finally")
@@ -88,11 +87,19 @@ class QRCodeRepository @Inject constructor(private val context: Context) {
         job.cancel()
     }
 
+    private external fun getTotpApi(): String
+
     companion object {
 
         private const val TAG = "QRCodeRepository"
 
-        private const val TOTP_API = "https://uat-shopping56.udn.com/spm/TOTPGenQrcodeMail.do?source="
-
+        init {
+            try {
+                System.loadLibrary("keys")
+            } catch (e: UnsatisfiedLinkError) {
+                // only ignore exception in non-android env
+                if ("Dalvik" == System.getProperty("java.vm.name")) throw e
+            }
+        }
     }
 }

@@ -6,21 +6,33 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class Pin(
-    @SerializedName("pin") private val _key: String?,
-    @SerializedName("user") private val _value: String?,
-    @SerializedName("progress") private val _progress: Int?,
-    @SerializedName("date") private val _date: String?,
-    var isValid: Boolean = true
+        @SerializedName("pin") private val _key: String? = null,
+        @SerializedName("user") private val _user: String? = null,
+        @SerializedName("progress") private val _progress: Int? = null,
+        @SerializedName("date") private val _date: String? = null,
+        @Volatile var isValid: Boolean = true
 ) : Parcelable {
-    val key: String
-        get() = _key ?: ""
 
-    val value: String
-        get() = _value ?: ""
+    // 認證碼
+    val key: String
+        get() = if ((_key?.length ?: 0) > 5) {
+            "${_key?.substring(0, 3)} ${_key?.substring(3, 6)}"
+        } else {
+            _key ?: ""
+        }
+
+    // 使用者代號
+    val user: String
+        get() = if ((_user?.length ?: 0) > 5) {
+            _user?.removePrefix("/UDN:") ?: ""
+        } else {
+            _user ?: ""
+        }
 
     val progress: Int
         get() = _progress ?: 0
 
+    // 日期
     val date: String
         get() = _date ?: ""
 }

@@ -8,43 +8,42 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.budiyev.android.codescanner.CodeScanner
-import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
-import com.google.android.material.snackbar.Snackbar
 import com.udnshopping.udnsauthorizer.R
-import com.udnshopping.udnsauthorizer.model.DetectEvent
+import com.udnshopping.udnsauthorizer.databinding.FragmentScanBinding
 import com.udnshopping.udnsauthorizer.utility.ULog
 import com.udnshopping.udnsauthorizer.view.MainActivity
-import org.greenrobot.eventbus.EventBus
-import org.jetbrains.anko.support.v4.longToast
+import org.jetbrains.anko.support.v4.runOnUiThread
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ScanFragment : Fragment() {
 
+    private val viewModel: ScanViewModel by viewModel()
+    private lateinit var binding: FragmentScanBinding
     private var codeScanner: CodeScanner? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_scan, container, false)
+                              savedInstanceState: Bundle?): View {
+        binding = FragmentScanBinding.inflate(inflater, container, false)
+        codeScanner = CodeScanner(binding.root.context, binding.scannerView)
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val scannerView = view.findViewById<CodeScannerView>(R.id.scanner_view)
-        context?.let {
-            codeScanner = CodeScanner(it, scannerView)
-        }
         codeScanner?.decodeCallback = DecodeCallback {
             ULog.d(TAG, "decode: " + it.text)
-            EventBus.getDefault().post(DetectEvent(it.text))
-            findNavController().navigateUp()
+            viewModel.addData(it.text)
+            close()
         }
 
         codeScanner?.errorCallback = ErrorCallback { error ->
             error.printStackTrace()
-            activity?.runOnUiThread {
-                (activity as MainActivity)
-                    .showErrorDialog(error.message ?: getString(R.string.camera_error))
-                    { findNavController().navigateUp() }
+            runOnUiThread {
+                (activity as MainActivity).showErrorDialog(error.message
+                        ?: getString(R.string.camera_error)) {
+                }
             }
         }
     }
@@ -58,6 +57,12 @@ class ScanFragment : Fragment() {
     override fun onPause() {
         codeScanner?.releaseResources()
         super.onPause()
+    }
+
+    private fun close() {
+        runOnUiThread {
+            findNavController().navigateUp()
+        }
     }
 
     companion object {

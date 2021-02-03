@@ -2,19 +2,13 @@ package com.udnshopping.udnsauthorizer.repository
 
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.google.gson.Gson
-import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.model.BroadcastMessage
 import com.udnshopping.udnsauthorizer.model.UdnRemoteConfig
 import com.udnshopping.udnsauthorizer.utility.ULog
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class RemoteConfigRepository @Inject
-constructor(private val remoteConfig: FirebaseRemoteConfig) {
+class RemoteConfigRepository constructor(private val remoteConfig: FirebaseRemoteConfig) {
 
     private var udnRemoteConfig: MutableLiveData<UdnRemoteConfig> = MutableLiveData()
 

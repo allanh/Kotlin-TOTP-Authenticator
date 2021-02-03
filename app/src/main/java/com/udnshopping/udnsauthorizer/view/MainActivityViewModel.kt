@@ -1,6 +1,5 @@
 package com.udnshopping.udnsauthorizer.view
 
-import android.os.Bundle
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -8,11 +7,11 @@ import androidx.lifecycle.ViewModel
 import com.udnshopping.udnsauthorizer.repository.RemoteConfigRepository
 import com.udnshopping.udnsauthorizer.repository.SecretRepository
 import com.udnshopping.udnsauthorizer.utility.ULog
-import javax.inject.Inject
 
-
-class MainActivityViewModel  @Inject
-constructor(private val configRepository: RemoteConfigRepository, private val secretRepository: SecretRepository) : ViewModel() {
+class MainActivityViewModel constructor(
+    private val configRepository: RemoteConfigRepository,
+    private val secretRepository: SecretRepository
+) : ViewModel() {
 
     private var udnRemoteConfig = configRepository.getRemoteConfigObservable()
     private var pins = secretRepository.getPinsObservable()
@@ -22,13 +21,13 @@ constructor(private val configRepository: RemoteConfigRepository, private val se
 
     var isEmailInputObservable = MutableLiveData<Boolean>()
 
-    var isDataEmptyObservable: LiveData<Boolean> = Transformations.map(pins) {
-            pinList -> pinList.isEmpty()
+    var isDataNotEmptyObservable: LiveData<Boolean> = Transformations.map(pins) { pinList ->
+        pinList.isNotEmpty()
     }
 
     var isForceUpdateObservable: LiveData<Boolean> = Transformations.map(udnRemoteConfig) { config ->
-        forceUpdateVersion = config.forceUpdateVersion
-        _isShowBroadcast = config.broadcast
+        forceUpdateVersion = config.forceUpdateVersion ?: "1.0.0"
+        _isShowBroadcast = config.broadcast ?: false
         isEmailInputObservable.postValue(config.isEmailInput)
         config.isForceUpdate
     }
@@ -44,7 +43,7 @@ constructor(private val configRepository: RemoteConfigRepository, private val se
 
     fun getQRCodeErrorEventObservable() = secretRepository.getQRCodeErrorEventObservable()
 
-    fun addData(auth: String) = secretRepository.addData(auth)
+    fun addData(auth: String?) = secretRepository.addData(auth)
 
     /**
      * Save the secrets to shared preferences.
@@ -63,6 +62,14 @@ constructor(private val configRepository: RemoteConfigRepository, private val se
     fun getBroadcastTitle() = udnRemoteConfig.value?.broadcastMessage?.title ?: ""
 
     fun getBroadcastBody() = udnRemoteConfig.value?.broadcastMessage?.body ?: ""
+
+    fun onEmailClick() {
+
+    }
+
+    fun onScanClick() {
+
+    }
 
     companion object {
         private const val TAG = "MainActivityViewModel"

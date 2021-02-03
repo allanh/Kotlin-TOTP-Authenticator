@@ -9,12 +9,10 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.findNavController
 import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
@@ -24,29 +22,23 @@ import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
 import com.udnshopping.udnsauthorizer.model.DetectEvent
 import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
-import dagger.android.support.DaggerAppCompatActivity
+import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class MainActivity : DaggerAppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    @Inject
-    lateinit var eventBus: EventBus
-    private lateinit var mainViewModel: MainActivityViewModel
+    private val mainViewModel: MainActivityViewModel by viewModel()
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ULog.d(TAG, "onCreate")
-        val binding = DataBindingUtil.setContentView<ActivityMainBinding>(this,
-            R.layout.activity_main
-        )
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         actionBar?.apply {
@@ -54,22 +46,10 @@ class MainActivity : DaggerAppCompatActivity() {
             setHomeButtonEnabled(true)
             setDisplayHomeAsUpEnabled(true)
         }
-
-        mainViewModel = ViewModelProviders.of(this, viewModelFactory).get(MainActivityViewModel::class.java)
-        mainViewModel.isForceUpdateObservable.observe(this, Observer {
-            checkUpdate(it)
-            if (mainViewModel.isShowBroadcast()) {
-                showDefaultDialog(mainViewModel.getBroadcastTitle(), mainViewModel.getBroadcastBody())
-            }
-        })
-        mainViewModel.getQRCodeErrorEventObservable().observe(this, Observer {
-            errorQRCodeAlert()
-        })
-        mainViewModel.fetchRemoteConfig()
+        subscribeUI()
 
         binding.viewModel = mainViewModel
         ULog.d(TAG, "onCreate done")
-        eventBus.register(this)
     }
 
     override fun onBackPressed() {
@@ -82,36 +62,19 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
-    override fun onKeyUp(keyCode: Int, event: KeyEvent): Boolean {
-        EventBus.getDefault().post(KeyUpEvent(keyCode))
-        return super.onKeyUp(keyCode, event)
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         return findNavController(R.id.nav_host_fragment).navigateUp()
     }
 
     override fun onResume() {
         super.onResume()
-
         val isForceUpdate = mainViewModel.isForceUpdateObservable.value ?: false
         checkUpdate(isForceUpdate)
-
-        val isDataEmpty = mainViewModel.isDataEmptyObservable.value ?: true
-        if (!isCurrentFragment(R.id.nav_host_fragment, R.id.mainFragment)
-            && isDataEmpty) {
-            findNavController(R.id.nav_host_fragment).navigate(R.id.mainFragment)
-        }
     }
 
     override fun onStop() {
         super.onStop()
         mainViewModel.saveData()
-    }
-
-    override fun onDestroy() {
-        eventBus.unregister(this)
-        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -158,6 +121,19 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
+    private fun subscribeUI() {
+        mainViewModel.isForceUpdateObservable.observe(this, Observer {
+            checkUpdate(it)
+            if (mainViewModel.isShowBroadcast()) {
+                showDefaultDialog(mainViewModel.getBroadcastTitle(), mainViewModel.getBroadcastBody())
+            }
+        })
+        mainViewModel.getQRCodeErrorEventObservable().observe(this, Observer {
+            errorQRCodeAlert()
+        })
+        mainViewModel.fetchRemoteConfig()
+    }
+
     fun checkPermission() {
         if (ContextCompat.checkSelfPermission(
                 applicationContext,
@@ -192,14 +168,16 @@ class MainActivity : DaggerAppCompatActivity() {
 
     fun scan() {
         ULog.d(TAG, "scan")
-        findNavController(R.id.nav_host_fragment).navigate(
-            R.id.scanFragment
-            // Disable the Google Vision Barcode Scanner
+        runOnUiThread {
+            findNavController(R.id.nav_host_fragment).navigate(
+                    R.id.scanFragment
+                    // Disable the Google Vision Barcode Scanner
 //            if (resources.getBoolean(R.bool.isTablet))
 //                R.id.scanFragment
 //            else
 //                R.id.gvScanFragment
-        )
+            )
+        }
     }
 
     private fun showPermissionDialog() {
@@ -291,14 +269,6 @@ class MainActivity : DaggerAppCompatActivity() {
                 ULog.d(TAG, "show update dialog")
                 if (!BuildConfig.DEBUG) showUpdateDialog()
             }
-        }
-    }
-
-    @Subscribe
-    @Suppress("unused")
-    fun onDetected(result: DetectEvent) {
-        result.auth.let {
-            mainViewModel.addData(it)
         }
     }
 

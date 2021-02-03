@@ -9,18 +9,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.extension.setProgressTintColor
 import com.udnshopping.udnsauthorizer.model.Pin
 
 class SecretAdapter(private var items: List<Pin>?, private val context: Context) :
-    androidx.recyclerview.widget.RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
+    RecyclerView.Adapter<SecretAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
-        val tvSecretType: TextView = view.findViewById(R.id.tv_secret_type)
-        val tvUserType: TextView = view.findViewById(R.id.tv_user_type)
-        val tvDate: TextView = view.findViewById(R.id.tv_date)
-        val progressBar: ProgressBar = view.findViewById(R.id.progressBar)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val tvSecretType: TextView = view.findViewById(R.id.secret_key_text_view)
+        val tvUserType: TextView = view.findViewById(R.id.secret_user_text_view)
+        val tvDate: TextView = view.findViewById(R.id.secret_date_text_view)
+        val progressBar: ProgressBar = view.findViewById(R.id.secret_progress_bar)
     }
 
     override fun getItemCount(): Int = items?.size ?: 0
@@ -41,11 +42,10 @@ class SecretAdapter(private var items: List<Pin>?, private val context: Context)
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         items?.let {
             // Key
-            val key = it[position].key
-            viewHolder.tvSecretType.text = "${key.substring(0, 3)} ${key.substring(3, 6)}"
+            viewHolder.tvSecretType.text = it[position].key
 
             // User and date
-            val user = it[position].value.removePrefix("/UDN:")
+            val user = it[position].user.removePrefix("/UDN:")
             viewHolder.tvUserType.text = user
             viewHolder.tvDate.text = it[position].date
 

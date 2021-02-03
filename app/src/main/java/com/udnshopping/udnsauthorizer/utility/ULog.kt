@@ -11,27 +11,32 @@ import com.udnshopping.udnsauthorizer.BuildConfig
 object ULog {
 
     fun e(tag: String, message: String?) {
-        if (BuildConfig.DEBUG && message != null)
+        message ?: return
+//        if (BuildConfig.DEBUG && message != null)
             Log.e(tag, message)
     }
 
     fun w(tag: String, message: String?) {
-        if (BuildConfig.DEBUG && message != null)
+        message ?: return
+//        if (BuildConfig.DEBUG && message != null)
             Log.w(tag, message)
     }
 
     fun i(tag: String, message: String?) {
-        if (BuildConfig.DEBUG && message != null)
+        message ?: return
+//        if (BuildConfig.DEBUG && message != null)
             Log.i(tag, message)
     }
 
     fun d(tag: String, message: String?) {
-        if (BuildConfig.DEBUG && message != null)
+        message ?: return
+//        if (BuildConfig.DEBUG && message != null)
             Log.d(tag, message)
     }
 
     fun v(tag: String, message: String?) {
-        if (BuildConfig.DEBUG && message != null)
+        message ?: return
+//        if (BuildConfig.DEBUG && message != null)
             Log.v(tag, message)
     }
 }

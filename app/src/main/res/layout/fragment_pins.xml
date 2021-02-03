@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout  xmlns:tools="http://schemas.android.com/tools"
-         xmlns:app="http://schemas.android.com/apk/res-auto"
-         xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="android.view.View"/>
 
         <variable
-                name="viewModel"
-                type="com.udnshopping.udnsauthorizer.view.pins.PinsViewModel" />
+            name="viewModel"
+            type="com.udnshopping.udnsauthorizer.view.pins.PinsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/darker_gray"
-            tools:context="com.udnshopping.udnsauthorizer.view.MainActivity">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray"
+        tools:context="com.udnshopping.udnsauthorizer.view.MainActivity">
 
         <TextView
-                android:text="@string/pins_hint"
-                android:gravity="left"
-                android:layout_width="300dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/tv_pins_hint"
-                android:textSize="16dp" android:layout_marginTop="120dp"
-                android:visibility="@{viewModel.isDataEmptyObservable ? View.VISIBLE : View.GONE}"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintHorizontal_bias="0.49"
-        />
+            android:id="@+id/tv_pins_hint"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:gravity="start"
+            android:text="@string/pins_hint"
+            android:textSize="16sp"
+            android:visibility="@{viewModel.pinsObservable.size() == 0}"
+            app:layout_constraintHorizontal_bias="0.49"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/pins_recycler_view"
-                android:scrollbars="none"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginBottom="8dp"
-                android:background="@android:color/darker_gray"
-                android:layout_marginTop="60dp"
-                android:visibility="@{!viewModel.isDataEmptyObservable ? View.VISIBLE : View.GONE}"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-        />
+            android:id="@+id/pins_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="60dp"
+            android:layout_marginBottom="8dp"
+            android:background="@android:color/darker_gray"
+            android:scrollbars="none"
+            android:visibility="@{viewModel.pinsObservable.size() > 0}"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

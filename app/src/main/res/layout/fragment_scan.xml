@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <com.budiyev.android.codescanner.CodeScannerView
+        <com.budiyev.android.codescanner.CodeScannerView
             android:id="@+id/scanner_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:autoFocusButtonVisible="false"
             app:flashButtonVisible="false"
-            app:frameColor="@color/colorAccent"
-            app:frameCornersSize="50dp"
-            app:frameCornersRadius="0dp"
-            app:frameAspectRatioWidth="1"
             app:frameAspectRatioHeight="1"
+            app:frameAspectRatioWidth="1"
+            app:frameColor="@color/colorAccent"
+            app:frameCornersRadius="0dp"
+            app:frameCornersSize="50dp"
             app:frameSize="0.6"
             app:frameThickness="2dp"
-            app:maskColor="@android:color/transparent"
-    />
-</FrameLayout>
+            app:maskColor="@android:color/transparent" />
+    </FrameLayout>
+
+</layout>

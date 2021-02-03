@@ -6,15 +6,7 @@ import javax.crypto.Cipher
 import javax.crypto.SecretKeyFactory
 import javax.crypto.spec.DESedeKeySpec
 
-object ThreeDESUtil {
-
-    private const val DES_FLAG = "DESede"                     // 3DES
-    private const val ENCODE_MODE = Cipher.ENCRYPT_MODE       // 加密模式
-    private const val DECODE_MODE = Cipher.DECRYPT_MODE       // 解密模式
-
-    init {
-        System.loadLibrary("native-lib")
-    }
+class ThreeDESUtil {
 
     private fun desEncrypt(mode: Int, password: String, content: ByteArray): ByteArray {
 
@@ -36,9 +28,9 @@ object ThreeDESUtil {
     private fun enCode(password: String, message: String): String {
         val bytes = message.toByteArray()
         val desEncrypt = desEncrypt(
-            ENCODE_MODE,
-            password,
-            bytes
+                ENCODE_MODE,
+                password,
+                bytes
         )
         val encode = Base64.encode(desEncrypt, Base64.DEFAULT)
         return String(encode)
@@ -47,9 +39,9 @@ object ThreeDESUtil {
     private fun deCode(password: String, message: String): String {
         val bytes = Base64.decode(message, Base64.DEFAULT)
         val desEncrypt = desEncrypt(
-            DECODE_MODE,
-            password,
-            bytes
+                DECODE_MODE,
+                password,
+                bytes
         )
         return String(desEncrypt)
     }
@@ -57,17 +49,32 @@ object ThreeDESUtil {
     @Suppress("unused")
     fun encrypt(message: String): String {
         return enCode(
-            getPassword(),
-            message
+                getPassword(),
+                message
         )
     }
 
     fun decrypt(message: String): String {
         return deCode(
-            getPassword(),
-            message
+                getPassword(),
+                message
         )
     }
 
     private external fun getPassword(): String
+
+    companion object {
+        private const val DES_FLAG = "DESede"                     // 3DES
+        private const val ENCODE_MODE = Cipher.ENCRYPT_MODE       // 加密模式
+        private const val DECODE_MODE = Cipher.DECRYPT_MODE       // 解密模式
+
+        init {
+            try {
+                System.loadLibrary("keys")
+            } catch (e: UnsatisfiedLinkError) {
+                // only ignore exception in non-android env
+                if ("Dalvik".equals(System.getProperty("java.vm.name"))) throw e
+            }
+        }
+    }
 }
