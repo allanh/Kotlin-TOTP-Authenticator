@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
@@ -18,9 +17,6 @@ import com.udnshopping.udnsauthorizer.BuildConfig
 import com.udnshopping.udnsauthorizer.R
 import com.udnshopping.udnsauthorizer.databinding.ActivityMainBinding
 import com.udnshopping.udnsauthorizer.extension.getCurrentFragmentId
-import com.udnshopping.udnsauthorizer.extension.isCurrentFragment
-import com.udnshopping.udnsauthorizer.model.DetectEvent
-import com.udnshopping.udnsauthorizer.model.KeyUpEvent
 import com.udnshopping.udnsauthorizer.utility.ULog
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.GlobalScope

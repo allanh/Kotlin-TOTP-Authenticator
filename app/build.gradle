@@ -1,3 +1,5 @@
+import java.text.SimpleDateFormat
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -46,7 +48,7 @@ android {
                 if (variant.buildType.name == 'debug') {
                     outputFileName = buildName + '-' + type + '.apk'
                 } else {
-                    outputFileName = buildName + '-' + type + "-" + versionName + '.apk'
+                    outputFileName = buildName + '-' + type + "-" + versionName + "-" + buildTime() + '.apk'
                 }
             }
         }
@@ -72,6 +74,17 @@ android {
             //   armeabi-v7a, arm64-v8a, x86, x86_64
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+static def buildTime() {
+    def df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'") // you can change it
+    df.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"))
+    return df.format(new Date())
 }
 
 dependencies {
@@ -99,7 +112,6 @@ dependencies {
     implementation "androidx.core:core-ktx:1.5.0-beta01"
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.room:room-runtime:2.3.0-beta01"
-    implementation "org.greenrobot:eventbus:3.1.1"
     kapt "androidx.room:room-compiler:2.3.0-beta01"
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 
